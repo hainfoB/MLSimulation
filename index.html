@@ -1377,8 +1377,8 @@
             document.getElementById('svm-steps-container').style.display = m==='2d'?'block':'none';
             document.getElementById('svm-math-log').style.display = m==='2d'?'block':'none';
             document.getElementById('svm-ctrl-3d').style.display = m==='3d'?'block':'none';
-            document.getElementById('btn-svm-2d').className = m==='2d' ? "bg-teal-600 text-white px-4 py-2 rounded-lg shadow font-bold" : "bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-lg";
-            document.getElementById('btn-svm-3d').className = m==='3d' ? "bg-teal-600 text-white px-4 py-2 rounded-lg shadow font-bold" : "bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-lg";
+            document.getElementById('btn-svm-2d').className = m==='2d' ? "bg-teal-600 text-white px-4 py-2 rounded-lg shadow font-bold hover:bg-teal-700 transition" : "bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-lg shadow font-bold hover:bg-slate-50 transition";
+            document.getElementById('btn-svm-3d').className = m==='3d' ? "bg-teal-600 text-white px-4 py-2 rounded-lg shadow font-bold hover:bg-teal-700 transition" : "bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-lg shadow font-bold hover:bg-slate-50 transition";
             svm_stopAuto();
             if(m==='2d') svm_draw(); else svm_animate3d();
         }
@@ -1549,20 +1549,40 @@
 
         /* === APRIORI LOGIQUE SIMULATEUR === */
         let apr_transactions = [];
-        const apr_items = ["🍎", "🥖", "🥛", "🧀", "🍪"];
+        // Liste étendue de 25 produits
+        const apr_items = [
+            "🍎", "🍌", "🍇", "🍊", "🍉", 
+            "🥖", "🥐", "🍞", "🥯", "🥪",
+            "🥛", "🧀", "🥚", "🧈", "🍦",
+            "🍗", "🥩", "🍔", "🍕", "🍟",
+            "🍪", "🍩", "🍫", "☕", "🥤"
+        ];
 
         function apr_generateData() {
             apr_transactions = [];
             const el = document.getElementById('apr-dataset-view');
             el.innerHTML = "";
-            for(let i=1; i<=6; i++) {
+            
+            // Génération de 30 transactions
+            for(let i=1; i<=30; i++) {
                 let t = [];
-                apr_items.forEach(item => { if(Math.random() > 0.5) t.push(item); });
-                if(t.length === 0) t.push(apr_items[Math.floor(Math.random()*apr_items.length)]);
+                // Probabilité ajustée à 0.8 (20% de chance d'avoir un item) pour éviter des paniers trop remplis
+                apr_items.forEach(item => { if(Math.random() > 0.85) t.push(item); });
+                
+                // S'assurer que le panier n'est pas vide
+                if(t.length === 0) {
+                    // Ajout de 1 à 3 items aléatoires
+                    const nbItems = Math.floor(Math.random() * 3) + 1;
+                    for(let k=0; k<nbItems; k++) {
+                        const randomItem = apr_items[Math.floor(Math.random()*apr_items.length)];
+                        if(!t.includes(randomItem)) t.push(randomItem);
+                    }
+                }
+                
                 apr_transactions.push(t);
-                el.innerHTML += `<div class="text-xs border-b border-slate-100 py-1 flex"><span class="font-bold w-8 text-slate-400">T${i}:</span> <span>${t.join(' ')}</span></div>`;
+                el.innerHTML += `<div class="text-xs border-b border-slate-100 py-1 flex"><span class="font-bold w-8 text-slate-400">T${i}:</span> <span class="tracking-widest">${t.join(' ')}</span></div>`;
             }
-            document.getElementById('apr-results').innerHTML = "<div class='text-center text-slate-400 mt-10'>Données prêtes. Cliquez sur Exécuter.</div>";
+            document.getElementById('apr-results').innerHTML = "<div class='text-center text-slate-400 mt-10'>30 Transactions générées avec 25 produits.<br>Cliquez sur Exécuter.</div>";
         }
 
         function apr_run() {
@@ -1585,19 +1605,52 @@
             let C1 = {};
             apr_items.forEach(item => C1[item] = countSup([item]));
             
-            let html = `<div class="bg-slate-50 p-3 rounded border mb-2"><h5 class="font-bold text-purple-700 text-sm">Étape 1 : Itemsets taille 1 (MinSup=${minSupCount})</h5><div class="grid grid-cols-2 gap-2 mt-2">`;
+            // --- GRAPHE BÂTONNET (Conservé et adapté pour plus d'items) ---
+            let chartHtml = `<div class="bg-white border border-slate-200 rounded p-3 mb-4 shadow-sm">
+                <h5 class="font-bold text-xs text-slate-500 uppercase mb-3 flex justify-between">
+                    <span><i class="fa-solid fa-chart-bar mr-2"></i>Fréquences (Top items)</span>
+                    <span class="text-[10px] normal-case bg-slate-100 px-2 rounded">MinSup: ${minSupCount} occurrences</span>
+                </h5>
+                <div class="space-y-1 max-h-40 overflow-y-auto pr-2 custom-scrollbar">`;
+            
+            // On trie pour afficher les plus fréquents en premier
+            const sortedItems = Object.entries(C1).sort((a,b) => b[1] - a[1]);
+
+            for (const [item, count] of sortedItems) {
+                if(count === 0) continue; // On masque les items jamais achetés
+                const percentage = (count / N) * 100;
+                const isFrequent = count >= minSupCount;
+                const barColor = isFrequent ? 'bg-purple-600' : 'bg-slate-300';
+                const opacity = isFrequent ? 'opacity-100' : 'opacity-60';
+                const fontWeight = isFrequent ? 'font-bold text-purple-900' : 'text-slate-500';
+                
+                chartHtml += `
+                    <div class="flex items-center text-[10px] ${opacity}">
+                        <div class="w-6 text-base text-center">${item}</div>
+                        <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                            <div class="${barColor} h-full" style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="w-8 text-right font-mono ${fontWeight}">${count}</div>
+                    </div>
+                `;
+            }
+            chartHtml += `</div></div>`;
+            // --- FIN GRAPHE ---
+
+            let html = chartHtml + `<div class="bg-slate-50 p-3 rounded border mb-2"><h5 class="font-bold text-purple-700 text-sm">Étape 1 : Itemsets fréquents (L1)</h5><div class="grid grid-cols-3 gap-2 mt-2">`;
             
             let L1 = [];
-            for (const [item, count] of Object.entries(C1)) {
+            for (const [item, count] of sortedItems) {
                 let keep = count >= minSupCount;
-                if(keep) L1.push(item);
-                let style = keep ? "bg-green-100 border-green-300 text-green-800" : "bg-red-50 border-red-200 text-red-400 opacity-60";
-                html += `<div class="border rounded p-1 text-xs flex justify-between ${style}"><span>${item}</span> <span>Sup: ${count}</span></div>`;
+                if(keep) {
+                    L1.push(item);
+                    html += `<div class="border rounded p-1 text-[10px] flex justify-between bg-green-100 border-green-300 text-green-800 font-bold"><span>${item}</span> <span>${count}</span></div>`;
+                }
             }
             html += `</div></div>`;
             
             if(L1.length > 1) {
-                html += `<div class="bg-slate-50 p-3 rounded border mb-2"><h5 class="font-bold text-purple-700 text-sm">Étape 2 : Paires (C2 -> L2)</h5><div class="grid grid-cols-2 gap-2 mt-2">`;
+                // Recherche des paires
                 let L2 = []; 
                 for(let i=0; i<L1.length; i++) {
                     for(let j=i+1; j<L1.length; j++) {
@@ -1605,30 +1658,80 @@
                         let count = countSup(pair);
                         let keep = count >= minSupCount;
                         if(keep) L2.push({items: pair, sup: count});
-                        let style = keep ? "bg-green-100 border-green-300 text-green-800" : "bg-red-50 border-red-200 text-red-400 opacity-60";
-                        html += `<div class="border rounded p-1 text-xs flex justify-between ${style}"><span>${pair.join('')}</span> <span>${count}</span></div>`;
                     }
                 }
-                html += `</div></div>`;
 
                 if(L2.length > 0) {
-                    html += `<div class="bg-white p-3 rounded border border-purple-200 shadow-sm"><h5 class="font-bold text-purple-900 text-sm mb-2"><i class="fa-solid fa-star mr-1"></i>Règles d'Association (MinConf=${minConfPct}%)</h5><ul class="text-xs space-y-1">`;
+                    html += `<div class="bg-slate-50 p-3 rounded border mb-2"><h5 class="font-bold text-purple-700 text-sm">Étape 2 : Paires Fréquentes (L2)</h5><div class="grid grid-cols-2 gap-2 mt-2">`;
+                    L2.forEach(pairObj => {
+                         html += `<div class="border rounded p-1 text-[10px] flex justify-between bg-blue-100 border-blue-300 text-blue-800"><span>${pairObj.items.join('+')}</span> <span>Sup: ${pairObj.sup}</span></div>`;
+                    });
+                    html += `</div></div>`;
+
+                    // --- PARTIE RÈGLES D'ASSOCIATION DÉTAILLÉE ---
+                    html += `<div class="bg-white p-3 rounded border border-purple-200 shadow-sm border-t-4 border-t-purple-500">
+                        <h5 class="font-bold text-purple-900 text-sm mb-3 flex items-center">
+                            <i class="fa-solid fa-list-check mr-2"></i>Règles d'Association
+                            <span class="ml-auto text-[10px] font-normal bg-purple-100 px-2 py-1 rounded text-purple-700">MinConf: ${minConfPct}%</span>
+                        </h5>
+                        <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">`;
+                    
+                    let rulesFound = 0;
                     L2.forEach(set => {
                         let [A, B] = set.items;
                         let supAB = set.sup;
+                        
+                        // Règle A -> B
                         let supA = C1[A];
                         let confAB = (supAB / supA) * 100;
-                        if(confAB >= minConfPct) html += `<li class="text-green-700 font-mono"><strong>${A} -> ${B}</strong> (Conf: ${confAB.toFixed(0)}%)</li>`;
+                        if(confAB >= minConfPct) {
+                            rulesFound++;
+                            html += `
+                            <div class="text-xs p-2 border border-slate-100 rounded bg-slate-50 hover:bg-white hover:shadow transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-bold text-slate-700 text-sm">${A} <i class="fa-solid fa-arrow-right text-slate-400 mx-1"></i> ${B}</span>
+                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold">${confAB.toFixed(1)}%</span>
+                                </div>
+                                <div class="text-[10px] text-slate-500 font-mono">
+                                    Conf = Sup(${A}+${B}) / Sup(${A}) = ${supAB} / ${supA}
+                                </div>
+                            </div>`;
+                        }
+
+                        // Règle B -> A
                         let supB = C1[B];
                         let confBA = (supAB / supB) * 100;
-                        if(confBA >= minConfPct) html += `<li class="text-green-700 font-mono"><strong>${B} -> ${A}</strong> (Conf: ${confBA.toFixed(0)}%)</li>`;
+                        if(confBA >= minConfPct) {
+                            rulesFound++;
+                            html += `
+                            <div class="text-xs p-2 border border-slate-100 rounded bg-slate-50 hover:bg-white hover:shadow transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-bold text-slate-700 text-sm">${B} <i class="fa-solid fa-arrow-right text-slate-400 mx-1"></i> ${A}</span>
+                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold">${confBA.toFixed(1)}%</span>
+                                </div>
+                                <div class="text-[10px] text-slate-500 font-mono">
+                                    Conf = Sup(${A}+${B}) / Sup(${B}) = ${supAB} / ${supB}
+                                </div>
+                            </div>`;
+                        }
                     });
-                    html += `</ul></div>`;
+                    
+                    if(rulesFound === 0) {
+                        html += `<div class="text-xs text-slate-400 italic text-center py-2">Aucune règle ne dépasse ${minConfPct}% de confiance. Essayez de baisser le seuil.</div>`;
+                    }
+                    html += `</div></div>`;
+                    // --- FIN PARTIE RÈGLES ---
+
                 } else {
-                    html += `<div class="text-xs text-slate-500 italic p-2">Aucune paire fréquente trouvée.</div>`;
+                    html += `<div class="text-xs text-slate-500 italic p-2 mt-2 bg-yellow-50 border border-yellow-100 rounded">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Aucune paire fréquente trouvée (L2 vide).
+                        <br>Conseil : Baissez le Min Support (%) pour voir plus de combinaisons.
+                    </div>`;
                 }
             } else {
-                html += `<div class="text-xs text-slate-500 italic p-2">Pas assez d'items fréquents.</div>`;
+                html += `<div class="text-xs text-slate-500 italic p-2 mt-2 bg-red-50 border border-red-100 rounded">
+                    Pas assez d'items fréquents pour former des paires.
+                </div>`;
             }
             resDiv.innerHTML = html;
         }
