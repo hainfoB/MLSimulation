@@ -21,26 +21,16 @@
         .bg-orange-custom { background-color: #f97316; }
         .hover-orange-custom:hover { background-color: #ea580c; }
         
-        .node { transition: all 0.3s ease; cursor: pointer; }
-        .node:hover { transform: scale(1.05); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-        
         canvas {
-            border: 2px solid #e2e8f0;
+            border: 1px solid #cbd5e1;
             border-radius: 0.5rem;
             cursor: crosshair;
             background-color: #ffffff;
             touch-action: none;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
         }
         
-        .step-active {
-            border-left: 4px solid #f97316;
-            background-color: #fff7ed;
-            font-weight: bold;
-            color: #ea580c;
-            transition: all 0.3s ease;
-        }
-
-        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
         .tab-content.active { display: block; }
         
         @keyframes fadeIn {
@@ -51,42 +41,70 @@
         .nav-btn.active {
             border-bottom: 3px solid #f97316;
             color: #f97316;
+            background-color: rgba(255,255,255,0.1);
         }
         
-        /* Table styles */
-        .data-table th { background-color: #f1f5f9; padding: 4px 8px; text-align: left; font-size: 0.75rem; color: #475569; }
-        .data-table td { border-top: 1px solid #e2e8f0; padding: 4px 8px; font-size: 0.75rem; }
+        /* Scrollbar élégante */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tool-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: 1px solid rgba(0,0,0,0.05); }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: #f97316; }
 
-        /* Bayes Network */
-        .bn-node { transition: all 0.3s; cursor: pointer; }
-        .bn-node:hover { transform: scale(1.05); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .pedago-box {
+            /* Replaced Tailwind @apply with equivalent CSS */
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f8fafc; /* slate-50 */
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+            border-left: 4px solid rgba(0,0,0,0.05);
+        }
+        .pedago-header {
+            /* Replaced Tailwind @apply with equivalent CSS */
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: #64748b; /* slate-500 */
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0; /* slate-200 */
+            padding-bottom: 0.25rem;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen font-sans">
 
     <!-- EN-TÊTE -->
-    <header class="bg-nuit text-white shadow-lg sticky top-0 z-50 border-b-4 border-orange-500">
+    <header class="bg-nuit text-white shadow-xl sticky top-0 z-50 border-b-4 border-orange-500">
         <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center py-4">
-                <div class="flex items-center space-x-3 mb-4 md:mb-0">
-                    <div class="bg-white/10 p-2 rounded-full">
+            <div class="flex flex-col md:flex-row justify-between items-center py-3">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0 cursor-pointer" onclick="switchTab('home')">
+                    <div class="bg-white/10 p-2.5 rounded-full hover:bg-white/20 transition">
                         <i class="fa-solid fa-brain text-2xl text-orange-custom"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold tracking-wide">Simulateur Machine Learning</h1>
-                        <p class="text-xs text-slate-400 uppercase tracking-wider">By Ahmed Haithem BERKANE</p>
+                        <h1 class="text-xl font-bold tracking-wide">Simulateur ML</h1>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-widest">M. Haithem BERKANE</p>
                     </div>
                 </div>
                 
-                <nav class="flex space-x-4 md:space-x-6 text-sm font-semibold overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
-                    <button onclick="switchTab('home')" id="btn-home" class="nav-btn active hover:text-orange-300 transition px-2 whitespace-nowrap"><i class="fa-solid fa-house mr-1"></i> Accueil</button>
-                    <button onclick="switchTab('knn')" id="btn-knn" class="nav-btn hover:text-orange-300 transition px-2 whitespace-nowrap"><i class="fa-solid fa-network-wired mr-1"></i> k-NN</button>
-                    <button onclick="switchTab('kmeans')" id="btn-kmeans" class="nav-btn hover:text-orange-300 transition px-2 whitespace-nowrap"><i class="fa-solid fa-layer-group mr-1"></i> K-Means</button>
-                    <button onclick="switchTab('bayes')" id="btn-bayes" class="nav-btn hover:text-orange-300 transition px-2 whitespace-nowrap"><i class="fa-solid fa-diagram-project mr-1"></i> Bayes</button>
-                    <button onclick="switchTab('svm')" id="btn-svm" class="nav-btn hover:text-orange-300 transition px-2 whitespace-nowrap"><i class="fa-solid fa-vector-square mr-1"></i> SVM</button>
-                    <button onclick="switchTab('apriori')" id="btn-apriori" class="nav-btn hover:text-orange-300 transition px-2 whitespace-nowrap"><i class="fa-solid fa-basket-shopping mr-1"></i> Apriori</button>
-                    <button onclick="switchTab('exam')" id="btn-exam" class="nav-btn hover:text-orange-300 transition px-2 whitespace-nowrap text-orange-custom"><i class="fa-solid fa-graduation-cap mr-1"></i> Corrigé 2021</button>
-                    <button onclick="switchTab('exam-22')" id="btn-exam-22" class="nav-btn hover:text-orange-300 transition px-2 whitespace-nowrap text-emerald-400"><i class="fa-solid fa-graduation-cap mr-1"></i> Corrigé 2022</button>
+                <nav class="flex space-x-1 overflow-x-auto pb-1 w-full md:w-auto items-center no-scrollbar text-xs font-medium">
+                    <button onclick="switchTab('home')" id="btn-home" class="nav-btn active px-3 py-2 rounded hover:bg-slate-800 transition"><i class="fa-solid fa-house"></i></button>
+                    <div class="h-4 w-px bg-slate-700 mx-1"></div>
+                    <button onclick="switchTab('knn')" id="btn-knn" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition">k-NN</button>
+                    <button onclick="switchTab('kmeans')" id="btn-kmeans" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition">K-Means</button>
+                    <button onclick="switchTab('hca')" id="btn-hca" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition">HCA</button>
+                    <button onclick="switchTab('bayes')" id="btn-bayes" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition">Bayes</button>
+                    <button onclick="switchTab('svm')" id="btn-svm" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition">SVM</button>
+                    <button onclick="switchTab('tree')" id="btn-tree" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition">Arbres</button>
+                    <button onclick="switchTab('apriori')" id="btn-apriori" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition">Apriori</button>
+                    <div class="h-4 w-px bg-slate-700 mx-1"></div>
+                    <button onclick="switchTab('exos')" id="btn-exos" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition text-pink-300">Exos</button>
+                    <button onclick="switchTab('exam')" id="btn-exam" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition text-indigo-300">Setif</button>
+                    <button onclick="switchTab('exam-22')" id="btn-exam-22" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition text-emerald-300">USTO</button>
+                    <button onclick="switchTab('exam-ghardaia')" id="btn-exam-ghardaia" class="nav-btn px-3 py-2 rounded hover:bg-slate-800 transition text-sky-300">Ghardaia</button>
                 </nav>
             </div>
         </div>
@@ -94,933 +112,545 @@
 
     <main class="flex-grow container mx-auto px-4 py-8">
 
-        <!-- ONGLET 1 : ACCUEIL -->
-        <div id="tab-home" class="tab-content active max-w-5xl mx-auto text-center space-y-12">
+        <!-- 1. ACCUEIL -->
+        <div id="tab-home" class="tab-content active max-w-6xl mx-auto text-center space-y-12">
             <div class="space-y-6 pt-10">
-                <h2 class="text-4xl font-extrabold text-slate-900">Bienvenue dans le <span class="text-orange-custom">Laboratoire Virtuel</span></h2>
-                <p class="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-                    Une plateforme interactive pédagogique pour visualiser et comprendre les algorithmes fondamentaux de l'Intelligence Artificielle.
+                <h2 class="text-5xl font-extrabold text-slate-900 tracking-tight">Laboratoire Virtuel <span class="text-orange-500">Machine Learning</span></h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto font-light">
+                    Plateforme pédagogique interactive pour l'apprentissage des algorithmes IA.
+                    <br>Méthodologie stricte : Données → Formules → Calculs → Résultats.
                 </p>
                 
-                <!-- Navigation Principale : Grille 3x3 -->
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12 px-4">
-                    
-                    <!-- k-NN -->
-                    <button onclick="switchTab('knn')" class="aspect-square bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 flex flex-col items-center justify-center gap-3 group">
-                        <i class="fa-solid fa-network-wired text-5xl mb-2 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xl font-bold">k-NN</span>
-                        <span class="text-xs bg-white/20 px-3 py-1 rounded-full font-medium">Nouveau</span>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-w-6xl mx-auto mt-12 px-2">
+                    <button onclick="switchTab('knn')" class="tool-card bg-blue-600 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-network-wired text-4xl"></i><span class="font-bold text-lg">k-NN</span>
                     </button>
-
-                    <!-- K-Means -->
-                    <button onclick="switchTab('kmeans')" class="aspect-square bg-orange-custom hover:bg-orange-600 text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 flex flex-col items-center justify-center gap-3 group">
-                        <i class="fa-solid fa-layer-group text-5xl mb-2 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xl font-bold">K-Means</span>
+                    <button onclick="switchTab('kmeans')" class="tool-card bg-orange-500 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-layer-group text-4xl"></i><span class="font-bold text-lg">K-Means</span>
                     </button>
-
-                    <!-- Bayes -->
-                    <button onclick="switchTab('bayes')" class="aspect-square bg-nuit hover:bg-slate-800 text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 flex flex-col items-center justify-center gap-3 group">
-                        <i class="fa-solid fa-diagram-project text-5xl mb-2 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xl font-bold">Bayes</span>
+                    <button onclick="switchTab('hca')" class="tool-card bg-purple-600 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-sitemap text-4xl"></i><span class="font-bold text-lg">HCA</span>
                     </button>
-
-                    <!-- SVM -->
-                    <button onclick="switchTab('svm')" class="aspect-square bg-teal-600 hover:bg-teal-700 text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 flex flex-col items-center justify-center gap-3 group">
-                        <i class="fa-solid fa-vector-square text-5xl mb-2 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xl font-bold">SVM</span>
+                    <button onclick="switchTab('bayes')" class="tool-card bg-slate-700 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-diagram-project text-4xl"></i><span class="font-bold text-lg">Bayes</span>
                     </button>
-
-                    <!-- Apriori -->
-                    <button onclick="switchTab('apriori')" class="aspect-square bg-purple-600 hover:bg-purple-700 text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 flex flex-col items-center justify-center gap-3 group">
-                        <i class="fa-solid fa-basket-shopping text-5xl mb-2 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xl font-bold">Apriori</span>
+                    <button onclick="switchTab('svm')" class="tool-card bg-teal-600 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-vector-square text-4xl"></i><span class="font-bold text-lg">SVM</span>
                     </button>
-
-                    <!-- Exam 2021 -->
-                    <button onclick="switchTab('exam')" class="aspect-square bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 flex flex-col items-center justify-center gap-3 group">
-                        <i class="fa-solid fa-graduation-cap text-5xl mb-2 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xl font-bold">Corrigé 2021</span>
-                        <span class="text-xs opacity-80 font-normal">Sétif</span>
+                    <button onclick="switchTab('tree')" class="tool-card bg-green-600 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-tree text-4xl"></i><span class="font-bold text-lg">Arbres</span>
                     </button>
-
-                    <!-- Exam 2022 (Centré en bas) -->
-                    <div class="col-span-2 md:col-span-1 md:col-start-2">
-                        <button onclick="switchTab('exam-22')" class="w-full h-full aspect-square bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 flex flex-col items-center justify-center gap-3 group">
-                            <i class="fa-solid fa-graduation-cap text-5xl mb-2 group-hover:scale-110 transition-transform"></i>
-                            <span class="text-xl font-bold">Corrigé 2022</span>
-                            <span class="text-xs opacity-80 font-normal">USTO</span>
-                        </button>
-                    </div>
-
+                    <button onclick="switchTab('apriori')" class="tool-card bg-yellow-500 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-basket-shopping text-4xl"></i><span class="font-bold text-lg">Apriori</span>
+                    </button>
+                    <button onclick="switchTab('exos')" class="tool-card bg-pink-500 text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-pencil text-4xl"></i><span class="font-bold text-lg">Exercices</span>
+                    </button>
+                    <button onclick="switchTab('exam-ghardaia')" class="tool-card col-span-2 bg-sky-600 text-white rounded-2xl p-4 flex flex-row items-center justify-center gap-6">
+                        <i class="fa-solid fa-file-signature text-5xl"></i>
+                        <div class="text-left"><span class="block font-bold text-2xl">Examens</span><span class="block text-sm opacity-90">Corrigés Détaillés</span></div>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- ONGLET : k-NN (NOUVEAU) -->
+        <!-- 2. KNN -->
         <div id="tab-knn" class="tab-content">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-900">Algorithme k-Nearest Neighbors (k-NN)</h2>
-                <p class="text-slate-500">Classification supervisée basée sur la proximité</p>
-            </div>
-
-            <div class="grid lg:grid-cols-3 gap-6 mb-12">
-                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 space-y-4">
-                    <h4 class="font-bold text-blue-900 border-b border-blue-200 pb-2">Principe</h4>
-                    <p class="text-xs text-slate-700 text-justify">
-                        Pour classer un nouveau point (curseur), l'algorithme cherche les <strong>k</strong> voisins les plus proches dans les données d'entraînement et effectue un vote majoritaire.
-                    </p>
-                    <div class="space-y-2 mt-4">
-                        <label class="block text-xs font-bold text-slate-700">Paramètre K :</label>
-                        <input type="number" id="knn-k-input" value="3" min="1" max="15" class="w-full p-2 border rounded text-center font-bold text-blue-600" onchange="knn_draw()">
+             <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">k-Nearest Neighbors (k-NN)</h2></div>
+             <div class="grid lg:grid-cols-3 gap-6 mb-12">
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 space-y-4">
+                    <h3 class="font-bold text-blue-900 border-b pb-2">Support Théorique</h3>
+                    <p class="text-sm text-slate-700"><strong>Définition :</strong> Algorithme d'apprentissage paresseux (Lazy Learning) qui classifie une nouvelle donnée en fonction de la majorité des classes de ses K voisins les plus proches.</p>
+                    <div class="bg-white p-2 rounded border text-xs font-mono">
+                        <strong>Formule (Euclidienne) :</strong><br> \( d(x,y) = \sqrt{\sum_{i=1}^n (x_i - y_i)^2} \)
                     </div>
-                    <button onclick="knn_reset()" class="w-full bg-white border border-slate-300 py-2 px-3 rounded text-sm hover:bg-slate-100 font-bold mt-4"><i class="fa-solid fa-shuffle mr-1"></i> Générer Données</button>
+                    <ul class="text-xs space-y-1 mt-2">
+                        <li><span class="text-green-600 font-bold">Avantages :</span> Simple, pas d'hypothèse sur les données, adaptable.</li>
+                        <li><span class="text-red-600 font-bold">Limites :</span> Lent (calcul de toutes les distances), sensible aux échelles (nécessite normalisation).</li>
+                    </ul>
                 </div>
-
-                <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow border border-slate-200 flex flex-col items-center relative">
-                    <canvas id="knnCanvas" width="600" height="400" class="w-full h-auto bg-slate-50"></canvas>
-                    <div class="absolute top-4 right-4 bg-white/90 p-2 rounded shadow text-xs pointer-events-none">
-                        <div class="flex items-center mb-1"><span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span> Classe A</div>
-                        <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span> Classe B</div>
+                <div class="col-span-2 space-y-4">
+                    <div class="bg-white p-4 rounded-xl border">
+                        <canvas id="knnCanvas" width="600" height="400" class="w-full h-auto bg-slate-50 rounded"></canvas>
+                        <p class="text-center text-xs text-slate-400 mt-2">Survolez pour voir les distances aux voisins.</p>
                     </div>
-                    <div class="mt-2 text-xs text-slate-400">Bougez la souris pour classer en temps réel. Clic pour ajouter un point.</div>
+                    <div class="flex gap-4 items-center bg-white p-4 rounded-xl border">
+                        <label class="font-bold text-sm">Paramètre K :</label>
+                        <input type="number" id="knn-k-input" value="3" min="1" max="15" class="border p-1 w-16 text-center rounded font-bold" onchange="knn_draw()">
+                        <button onclick="knn_reset()" class="bg-blue-600 text-white px-4 py-1 rounded font-bold hover:bg-blue-700">Régénérer</button>
+                    </div>
                 </div>
-            </div>
+             </div>
         </div>
 
-        <!-- ONGLET 2 : K-MEANS -->
+        <!-- 3. K-MEANS -->
         <div id="tab-kmeans" class="tab-content">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-900">Algorithme K-Means (Clustering)</h2>
-                <p class="text-slate-500">Regroupement de données non supervisé</p>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 grid grid-cols-1 lg:grid-cols-3 gap-0 mb-12">
-                <!-- Contrôles & Étapes -->
-                <div class="p-6 bg-slate-50 border-r border-slate-200 flex flex-col h-full">
-                    <div class="space-y-3 mb-6">
-                        <label class="block text-sm font-bold text-nuit uppercase">1. Configuration</label>
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-600 text-sm">Clusters (K):</span>
-                            <input type="number" id="k-value" value="3" min="1" max="5" class="w-16 p-1 border rounded text-center font-bold text-orange-custom border-orange-200 focus:ring-orange-500">
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="km_generateRandomPoints()" class="flex-1 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 py-2 px-3 rounded text-sm font-medium"><i class="fa-solid fa-shuffle mr-1"></i> Générer Points</button>
-                            <button onclick="km_clearCanvas()" class="bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 py-2 px-3 rounded text-sm"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-3 mb-6">
-                        <label class="block text-sm font-bold text-nuit uppercase">2. Animation</label>
-                        <button onclick="km_initCentroids()" class="w-full bg-nuit hover:bg-slate-800 text-white py-2 rounded shadow-md transition text-sm font-bold"><i class="fa-solid fa-play mr-2 text-orange-custom"></i> Initialiser Centroïdes</button>
-                        <div class="flex space-x-2">
-                            <button id="btn-km-step" onclick="km_nextStep()" class="flex-1 bg-orange-custom hover:bg-orange-600 text-white py-2 rounded shadow-md transition text-sm font-bold"><i class="fa-solid fa-forward-step mr-1"></i> Étape Suivante</button>
-                            <button id="btn-km-run" onclick="km_runAuto()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded shadow-md transition text-sm font-bold"><i class="fa-solid fa-rocket mr-1"></i> Auto</button>
-                        </div>
-                    </div>
-
-                    <!-- Liste des étapes dynamique -->
-                    <div class="bg-white border border-slate-200 rounded-lg p-4 flex-grow">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-3">Déroulement de l'Algorithme</h4>
-                        <ul class="space-y-2 text-xs text-slate-600">
-                            <li id="step-0" class="p-2 rounded transition-colors duration-300">1. Initialisation (Choix de K points aléatoires)</li>
-                            <li id="step-1" class="p-2 rounded transition-colors duration-300">2. Affectation (Minimiser Distance)</li>
-                            <li id="step-2" class="p-2 rounded transition-colors duration-300">3. Mise à jour (Calcul Moyenne/Barycentre)</li>
-                            <li id="step-3" class="p-2 rounded transition-colors duration-300">4. Convergence (Plus rien ne bouge)</li>
-                        </ul>
-                    </div>
+            <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">K-Means Clustering</h2></div>
+            <div class="bg-orange-50 p-6 rounded-xl border border-orange-200 mb-6">
+                 <h4 class="font-bold text-orange-900 mb-2">Théorie & Concepts</h4>
+                 <p class="text-sm text-slate-700 mb-2">Partitionne les données en K groupes en minimisant l'inertie intra-classe (variance).</p>
+                 <div class="grid md:grid-cols-2 gap-4 text-xs">
+                     <div>
+                         <strong>Démarche :</strong>
+                         <ol class="list-decimal list-inside ml-2">
+                            <li>Initialiser K centres aléatoirement.</li>
+                            <li>Affecter chaque point au centre le plus proche.</li>
+                            <li>Recalculer les centres (moyenne des points).</li>
+                            <li>Répéter jusqu'à convergence.</li>
+                         </ol>
+                     </div>
+                     <div>
+                         <strong>Formules :</strong><br>
+                         Inertie : \( J = \sum_{k=1}^K \sum_{x \in C_k} ||x - \mu_k||^2 \)<br>
+                         Mise à jour : \( \mu_k = \frac{1}{|C_k|} \sum_{x \in C_k} x \)
+                     </div>
+                 </div>
+                 <div class="mt-2 text-xs">
+                     <span class="text-green-600 font-bold">Points Forts :</span> Rapide (O(N)), Scalable. 
+                     <span class="text-red-600 font-bold ml-2">Faiblesses :</span> Sensible à l'initialisation (K-Means++ aide), K doit être connu, Formes sphériques seulement.
+                 </div>
+             </div>
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="bg-white p-4 rounded-xl border space-y-4">
+                    <button onclick="km_generateRandomPoints()" class="w-full bg-slate-200 hover:bg-slate-300 py-2 rounded font-bold text-sm">1. Générer Points</button>
+                    <button onclick="km_initCentroids()" class="w-full bg-nuit text-white py-2 rounded font-bold text-sm">2. Init K=3</button>
+                    <button onclick="km_nextStep()" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded font-bold text-sm">3. Étape Suivante</button>
+                    <button onclick="km_runAuto()" id="btn-km-auto" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded font-bold text-sm">4. Auto Entraînement</button>
                 </div>
-
-                <!-- Canvas & Maths -->
-                <div class="col-span-2 p-6 bg-white relative flex flex-col">
-                    <canvas id="kmeansCanvas" width="600" height="400" class="w-full h-auto shadow-inner border bg-slate-50 mb-4"></canvas>
-                    
-                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-slate-700">
-                        <h4 class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-calculator mr-2"></i>Règles Mathématiques</h4>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <p class="font-bold text-xs mb-1">1. Distance Euclidienne (Affectation)</p>
-                                <p class="font-mono text-xs bg-white p-1 rounded border">\( d(x, c_k) = \sqrt{\sum (x_i - c_{ki})^2} \)</p>
-                                <p class="text-[10px] text-slate-500 mt-1">On assigne le point au cluster \( k \) qui minimise \( d \).</p>
-                            </div>
-                            <div>
-                                <p class="font-bold text-xs mb-1">2. Barycentre (Mise à jour)</p>
-                                <p class="font-mono text-xs bg-white p-1 rounded border">\( \mu_k = \frac{1}{|S_k|} \sum_{x_j \in S_k} x_j \)</p>
-                                <p class="text-[10px] text-slate-500 mt-1">Le nouveau centre est la moyenne des points du groupe.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Théorie K-Means -->
-            <div class="grid md:grid-cols-2 gap-8 mb-12">
-                <div class="bg-white p-6 rounded-xl shadow border-t-4 border-orange-500">
-                    <h3 class="text-lg font-bold text-nuit mb-3">Avantages & Applications</h3>
-                    <ul class="space-y-2 text-sm text-slate-600">
-                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i><strong>Simplicité :</strong> Facile à comprendre et à implémenter.</li>
-                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i><strong>Rapidité :</strong> Très efficace sur de grands jeux de données (complexité linéaire).</li>
-                        <li class="mt-2 font-bold text-nuit">Domaines d'application :</li>
-                        <ul class="list-disc list-inside pl-4">
-                            <li>Segmentation clients (Marketing)</li>
-                            <li>Compression d'images (Quantification)</li>
-                            <li>Détection d'anomalies (Cybersécurité)</li>
-                        </ul>
-                    </ul>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow border-t-4 border-red-500">
-                    <h3 class="text-lg font-bold text-nuit mb-3">Limites de l'Algorithme</h3>
-                    <ul class="space-y-2 text-sm text-slate-600">
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Choix de K :</strong> Il faut connaître le nombre de groupes à l'avance (ou utiliser la méthode du coude).</li>
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Sensibilité :</strong> Les résultats dépendent de l'initialisation aléatoire (Optimum local).</li>
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Forme :</strong> Suppose que les clusters sont sphériques (mauvais pour les formes complexes).</li>
-                    </ul>
+                <div class="lg:col-span-2 bg-white p-2 rounded-xl border shadow-inner">
+                    <canvas id="kmeansCanvas" width="600" height="400" class="w-full h-auto bg-slate-50 rounded"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- ONGLET 3 : BAYES -->
-        <div id="tab-bayes" class="tab-content space-y-8">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-900">Approche Bayésienne</h2>
-                <p class="text-slate-500">Probabilités conditionnelles et causalité</p>
-            </div>
-            
-            <!-- Bayes Naif -->
-            <section class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-                <div class="bg-nuit px-6 py-4 text-white flex justify-between items-center border-b-4 border-orange-500">
-                    <h3 class="text-xl font-bold"><i class="fa-solid fa-envelope-open-text mr-2 text-orange-custom"></i>1. Bayes Naïf (Exemple Spam)</h3>
+        <!-- 4. HCA -->
+        <div id="tab-hca" class="tab-content">
+            <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">Classification Hiérarchique (HCA)</h2></div>
+            <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 mb-6">
+                 <h4 class="font-bold text-purple-900 mb-2">Théorie & Concepts</h4>
+                 <p class="text-sm text-slate-700 mb-2">Construit une hiérarchie de clusters (Dendrogramme) par fusion successive (Bottom-Up / Agglomératif).</p>
+                 <div class="grid md:grid-cols-2 gap-4 text-xs">
+                     <div>
+                         <strong>Métriques de lien (Linkage) :</strong>
+                         <ul class="list-disc list-inside">
+                             <li>Single : Dist min (sensible effet chaîne).</li>
+                             <li>Complete : Dist max (clusters compacts).</li>
+                             <li><strong>Ward :</strong> Minimise l'augmentation de la variance interne.</li>
+                         </ul>
+                     </div>
+                     <div>
+                         <span class="text-green-600 font-bold">Avantages :</span> Pas de K a priori, Visualisation riche (Dendrogramme).<br>
+                         <span class="text-red-600 font-bold">Limites :</span> Très lent \(O(N^3)\) ou \(O(N^2)\), glouton (choix irréversibles).
+                     </div>
+                 </div>
+             </div>
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="bg-white p-4 rounded-xl border space-y-4">
+                    <button onclick="hca_init()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded font-bold mb-2">Nouveau Jeu</button>
+                    <button onclick="hca_step()" id="btn-hca-step" class="w-full bg-white border-2 border-purple-200 text-purple-700 hover:bg-purple-50 py-2 rounded font-bold">Fusion Suivante</button>
                 </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                    <!-- Partie Gauche : Théorie et Calcul -->
-                    <div class="p-6 bg-slate-50 border-r border-slate-200 flex flex-col overflow-y-auto max-h-[600px]">
-                        <h4 class="font-bold text-teal-800 mb-2">Comment calculer ? (Dataset Exemple)</h4>
-                        <p class="text-xs text-slate-600 mb-2">Imaginons ce petit historique de messages (Dataset d'entrainement) :</p>
-                        
-                        <div class="overflow-x-auto mb-4 border rounded">
-                            <table class="w-full data-table bg-white">
-                                <thead><tr><th>Message</th><th>Label</th></tr></thead>
-                                <tbody>
-                                    <tr><td>"Gagnez argent vite"</td><td class="text-red-600 font-bold">Spam</td></tr>
-                                    <tr><td>"Argent gratuit ici"</td><td class="text-red-600 font-bold">Spam</td></tr>
-                                    <tr><td>"Bonjour mon ami"</td><td class="text-green-600 font-bold">Ham</td></tr>
-                                    <tr><td>"Réunion urgente bureau"</td><td class="text-green-600 font-bold">Ham</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="bg-white p-3 border border-indigo-100 rounded mb-4 text-xs text-indigo-900 font-mono">
-                            <strong>Règle de Bayes Naïf :</strong><br>
-                            \( P(C|X) \propto P(C) \times \prod P(w_i|C) \)<br><br>
-                            <em>Exemple : Proba que "Argent" soit Spam ?</em><br>
-                            \( P(Argent|Spam) = \frac{\text{Nb 'Argent' dans Spam}}{\text{Total mots Spam}} \)
-                        </div>
-                    </div>
-
-                    <!-- Partie Droite : Simulateur -->
-                    <div class="p-6 bg-white space-y-4">
-                        <div class="flex space-x-2">
-                            <input type="text" id="spamInput" placeholder="Ex: gagnez argent urgent..." class="flex-1 border border-slate-300 rounded p-2 focus:ring focus:ring-orange-500 outline-none">
-                            <button onclick="analyzeSpam()" class="bg-orange-custom text-white px-4 py-2 rounded hover:bg-orange-600 transition font-bold">Calculer</button>
-                        </div>
-                        <div class="h-4 bg-slate-200 rounded-full overflow-hidden flex relative">
-                            <div id="hamBar" class="h-full bg-emerald-500 transition-all duration-500" style="width: 50%"></div>
-                            <div id="spamBar" class="h-full bg-red-500 transition-all duration-500" style="width: 50%"></div>
-                        </div>
-                        <div class="text-center text-xs font-mono text-slate-500" id="probLabel">Ham: 50% - Spam: 50%</div>
-                        <div id="wordAnalysis" class="text-xs space-y-1 mt-2 max-h-32 overflow-y-auto"></div>
-                        <div id="naive-math-trace" class="text-xs font-mono text-slate-600 bg-slate-50 p-2 rounded border mt-2">En attente de calcul...</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Réseau Bayésien -->
-            <section class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 mt-8">
-                <div class="bg-nuit px-6 py-4 text-white flex justify-between items-center border-b-4 border-orange-500">
-                    <h3 class="text-xl font-bold"><i class="fa-solid fa-share-nodes mr-2 text-orange-custom"></i>2. Réseau Bayésien (Causalité)</h3>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
-                    <div class="p-6 bg-slate-50 border-r border-slate-200 col-span-1 h-[500px] flex flex-col">
-                        <h4 class="font-bold text-teal-800 mb-2">Théorie & Calcul</h4>
-                        <p class="text-xs text-slate-600 mb-3 text-justify">
-                            Le graphe représente les dépendances conditionnelles. L'inférence calcule la probabilité en propageant l'information.
-                        </p>
-                        <div class="bg-white p-2 border border-teal-100 rounded mb-2 text-[10px] text-teal-800 font-mono">
-                            <strong>Probabilité Conjointe (La Règle d'Or) :</strong><br>
-                            \( P(S,M,U,L) = P(S) \cdot P(M|S) \cdot P(U|S) \cdot P(L|S,U) \)
-                        </div>
-                        <p class="text-xs text-slate-600 mb-2">L'inférence consiste à sommer les probabilités de tous les mondes compatibles.</p>
-                        <div class="math-trace-container bg-white shadow-inner flex-grow text-xs leading-5" id="bn-trace"><div class="text-slate-400 italic">Cliquez sur les nœuds...</div></div>
-                    </div>
-                    <div class="col-span-2 bg-white relative h-[500px] select-none overflow-hidden bg-slate-50/50">
-                        <!-- SVG CONNECTIONS (Improved) -->
-                        <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
-                            <defs>
-                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="28" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
-                            </defs>
-                            <!-- Curved paths -->
-                            <path d="M 300 100 Q 150 150 150 220" marker-end="url(#arrowhead)"/>
-                            <path d="M 300 100 Q 450 150 450 220" marker-end="url(#arrowhead)"/>
-                            <path d="M 300 100 Q 300 200 300 380" marker-end="url(#arrowhead)"/>
-                            <path d="M 450 220 Q 400 300 300 380" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
-                        </svg>
-                        
-                        <!-- Graph Nodes (Improved Styling) -->
-                        <div id="node-spam" class="absolute top-[30px] left-[250px] w-32 h-24 bg-white border-2 border-red-200 rounded-lg shadow-lg node z-20 flex flex-col p-2">
-                            <div class="flex items-center space-x-2 border-b border-red-100 pb-1 mb-1">
-                                <i class="fa-solid fa-spider text-red-500"></i>
-                                <span class="font-bold text-xs text-red-900">SPAM (Cause)</span>
-                            </div>
-                            <div class="flex-grow flex items-center justify-center">
-                                <span id="txt-spam" class="text-lg font-bold text-slate-700">40%</span>
-                            </div>
-                            <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div id="bar-spam" class="h-full bg-red-500 transition-all duration-500" style="width: 40%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Enfants -->
-                        <div id="node-money" onclick="toggleBnNode('money')" class="absolute top-[220px] left-[100px] w-28 h-20 bg-white border border-slate-300 rounded-lg shadow-md node z-10 hover:border-orange-500 flex flex-col p-2">
-                            <div class="text-[10px] font-bold text-slate-500 mb-1"><i class="fa-solid fa-sack-dollar mr-1"></i>Mot "Argent"</div>
-                            <div class="flex-grow text-center font-mono text-sm" id="txt-money">30%</div>
-                            <div class="w-full h-1 bg-slate-100 rounded"><div id="bar-money" class="h-full bg-blue-500" style="width: 30%"></div></div>
-                        </div>
-
-                        <div id="node-urgent" onclick="toggleBnNode('urgent')" class="absolute top-[220px] right-[100px] w-28 h-20 bg-white border border-slate-300 rounded-lg shadow-md node z-10 hover:border-orange-500 flex flex-col p-2">
-                            <div class="text-[10px] font-bold text-slate-500 mb-1"><i class="fa-solid fa-stopwatch mr-1"></i>Mot "Urgent"</div>
-                            <div class="flex-grow text-center font-mono text-sm" id="txt-urgent">50%</div>
-                            <div class="w-full h-1 bg-slate-100 rounded"><div id="bar-urgent" class="h-full bg-blue-500" style="width: 50%"></div></div>
-                        </div>
-
-                        <div id="node-link" onclick="toggleBnNode('link')" class="absolute top-[380px] left-[250px] w-28 h-20 bg-white border border-slate-300 rounded-lg shadow-md node z-10 hover:border-orange-500 flex flex-col p-2">
-                            <div class="text-[10px] font-bold text-slate-500 mb-1"><i class="fa-solid fa-link mr-1"></i>Lien Suspect</div>
-                            <div class="flex-grow text-center font-mono text-sm" id="txt-link">45%</div>
-                            <div class="w-full h-1 bg-slate-100 rounded"><div id="bar-link" class="h-full bg-blue-500" style="width: 45%"></div></div>
-                        </div>
-                        
-                        <button onclick="resetBnNetwork()" class="absolute bottom-2 right-2 text-xs bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded">Reset</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Comparatif Bayes -->
-            <div class="bg-white p-6 rounded-xl shadow border-t-4 border-indigo-900 mt-8">
-                <h3 class="text-lg font-bold text-nuit mb-4">Comparatif : Naïf vs Réseaux</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-slate-600">
-                        <thead class="bg-slate-100 text-xs uppercase font-bold text-slate-700">
-                            <tr><th class="p-2">Critère</th><th class="p-2">Bayes Naïf</th><th class="p-2">Réseau Bayésien</th></tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <tr><td class="p-2 font-bold">Hypothèse</td><td>Indépendance stricte (mots isolés)</td><td>Dépendances causales (Graphe)</td></tr>
-                            <tr><td class="p-2 font-bold">Complexité</td><td>Faible (Calcul rapide)</td><td>Élevée (NP-Difficile si complexe)</td></tr>
-                            <tr><td class="p-2 font-bold">Avantage</td><td>Marche bien avec peu de données</td><td>Modélise la réalité (Diagnostic)</td></tr>
-                            <tr><td class="p-2 font-bold">Limite</td><td>Ignore le contexte (ex: "Pas bon")</td><td>Difficile à construire et calculer</td></tr>
-                        </tbody>
-                    </table>
+                <div class="col-span-2 bg-white p-4 rounded-xl border shadow-inner flex gap-4">
+                    <div class="flex-1 text-center"><span class="text-xs font-bold text-slate-400 block mb-2">Espace 2D</span><canvas id="hcaCanvasPoints" width="300" height="300" class="bg-slate-50 border rounded w-full"></canvas></div>
+                    <div class="flex-1 text-center"><span class="text-xs font-bold text-slate-400 block mb-2">Dendrogramme</span><canvas id="hcaCanvasDendro" width="300" height="300" class="bg-slate-50 border rounded w-full"></canvas></div>
                 </div>
             </div>
         </div>
 
-        <!-- ONGLET 4 : SVM -->
+        <!-- 5. SVM -->
         <div id="tab-svm" class="tab-content">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-900">SVM (Support Vector Machines)</h2>
-                <p class="text-slate-500">Séparateurs à Marge Maximale</p>
-            </div>
-            
-            <!-- THEORIE SVM DETAILLEE AVANT SIMULATION -->
-            <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border-l-4 border-teal-600">
-                <h3 class="text-2xl font-bold text-nuit mb-6"><i class="fa-solid fa-graduation-cap text-teal-600 mr-2"></i>Théorie Mathématique : Comment trouver la ligne parfaite ?</h3>
-                
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Partie 1: L'Hyperplan -->
-                    <div>
-                        <h4 class="text-lg font-bold text-teal-800 mb-2">1. L'Hyperplan Séparateur</h4>
-                        <p class="text-sm text-slate-600 mb-3 text-justify">
-                            L'objectif du SVM est de trouver une fonction \( f(x) \) qui sépare les données.
-                            La frontière de décision est la droite (ou l'hyperplan en 3D+) où \( f(x) = 0 \).
-                        </p>
-                        <div class="bg-slate-50 p-4 rounded border border-slate-200 text-sm font-mono text-slate-800">
-                            \( f(x) = w \cdot x + b \)<br><br>
-                            - \( w \) : Vecteur poids (oriente la droite)<br>
-                            - \( x \) : Vecteur de données<br>
-                            - \( b \) : Biais (déplace la droite)
-                        </div>
-                    </div>
-
-                    <!-- Partie 2: Le Gradient -->
-                    <div>
-                        <h4 class="text-lg font-bold text-teal-800 mb-2">2. Optimisation (Descente de Gradient)</h4>
-                        <p class="text-sm text-slate-600 mb-3 text-justify">
-                            Pour trouver le meilleur \( w \), on minimise l'erreur (Hinge Loss).
-                            Si un point est mal classé, on "pousse" la droite pour corriger l'erreur.
-                        </p>
-                        <div class="bg-slate-50 p-4 rounded border border-slate-200 text-sm font-mono text-slate-800">
-                            <strong>Règle de mise à jour :</strong><br>
-                            \( w_{new} = w_{old} - \alpha (\lambda w - y_i x_i) \)<br><br>
-                            - \( \alpha \) : Taux d'apprentissage (Learning Rate)<br>
-                            - \( y_i \) : Label du point (+1 ou -1)
-                        </div>
-                    </div>
+            <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">Support Vector Machines (SVM)</h2></div>
+            <div class="bg-teal-50 p-6 rounded-xl border border-teal-200 mb-6">
+                 <h4 class="font-bold text-teal-900 mb-2">Théorie & Formules</h4>
+                 <div class="grid md:grid-cols-2 gap-4 text-xs">
+                     <div>
+                         <strong>Objectif :</strong> Maximiser la marge \( M = \frac{2}{||w||} \) entre les classes.<br>
+                         <strong>Primal :</strong> \( \min_{w,b} \frac{1}{2}||w||^2 \) sous \( y_i(w \cdot x_i + b) \geq 1 \).<br>
+                         <strong>Décision :</strong> \( f(x) = \text{sign}(w \cdot x + b) \).
+                     </div>
+                     <div>
+                         <strong>Dual (Lagrange) :</strong> \( \max_\alpha \sum \alpha_i - \frac{1}{2} \sum \alpha_i \alpha_j y_i y_j K(x_i, x_j) \).<br>
+                         <span class="text-green-600 font-bold">Points forts :</span> Robuste (Marge), Non-linéaire (Kernels), Global optimal (Convexe).<br>
+                         <span class="text-red-600 font-bold">Faiblesses :</span> Pas de probabilités, lent si N grand.
+                     </div>
+                 </div>
+             </div>
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-2 rounded-xl shadow border relative">
+                    <canvas id="svmCanvas" width="600" height="400" class="w-full h-auto bg-slate-50 rounded"></canvas>
+                    <div id="svm-eq-display" class="absolute bottom-4 left-4 right-4 bg-white/90 p-2 rounded text-center font-mono text-xs text-teal-800 border border-teal-100 shadow">Equation : En attente...</div>
                 </div>
-            </div>
-
-            <!-- CONTROLES DU MODE -->
-            <div class="flex justify-center space-x-4 mb-6">
-                <button onclick="setSvmMode('2d')" id="btn-svm-2d" class="bg-teal-600 text-white px-4 py-2 rounded-lg shadow font-bold hover:bg-teal-700 transition"><i class="fa-solid fa-border-all mr-2"></i>SVM Linéaire (2D)</button>
-                <button onclick="setSvmMode('3d')" id="btn-svm-3d" class="bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-lg shadow font-bold hover:bg-slate-50 transition"><i class="fa-solid fa-cube mr-2"></i>Kernel Trick (3D)</button>
-            </div>
-
-            <!-- SIMULATION SVM -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 grid grid-cols-1 lg:grid-cols-3 gap-0 mb-12">
-                
-                <!-- Panneau de Contrôle -->
-                <div class="p-6 bg-slate-50 border-r border-slate-200 flex flex-col h-full">
-                    
-                    <div id="svm-ctrl-2d" class="space-y-4">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-sm font-bold text-slate-700">Classe :</span>
-                            <div class="flex space-x-2">
-                                <button onclick="svm_currentClass=1" class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow hover:scale-110 transition ring-2 ring-blue-200 focus:ring-blue-600"></button>
-                                <button onclick="svm_currentClass=-1" class="w-8 h-8 rounded-full bg-red-500 border-2 border-white shadow hover:scale-110 transition ring-2 ring-red-200 focus:ring-red-600"></button>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="svm_generateRandom()" class="flex-1 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 py-2 px-3 rounded text-sm font-medium"><i class="fa-solid fa-shuffle mr-1"></i> Aléatoire</button>
-                            <button onclick="svm_reset()" class="bg-white border border-slate-300 text-slate-600 py-2 px-3 rounded text-sm hover:bg-slate-50"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-
-                        <hr class="border-slate-200">
-
-                        <button onclick="svm_trainStep()" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 rounded shadow transition font-bold text-sm"><i class="fa-solid fa-play mr-2"></i> Étape Suivante (Gradient)</button>
-                        <button onclick="svm_trainAuto()" id="btn-svm-auto" class="w-full bg-orange-custom hover:bg-orange-600 text-white py-2 rounded shadow transition font-bold text-sm"><i class="fa-solid fa-rocket mr-2"></i> Entraînement Auto</button>
-                    </div>
-
-                    <!-- Liste des étapes SVM -->
-                    <div id="svm-steps-container" class="mt-6 bg-white border border-slate-200 rounded-lg p-4">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-3">Déroulement Algorithme</h4>
-                        <ul class="space-y-2 text-xs text-slate-600">
-                            <li id="svm-step-0" class="p-2 rounded transition-colors duration-300">1. Initialisation (Hyperplan aléatoire)</li>
-                            <li id="svm-step-1" class="p-2 rounded transition-colors duration-300">2. Prédiction (Test \( f(x_i) \))</li>
-                            <li id="svm-step-2" class="p-2 rounded transition-colors duration-300">3. Calcul Erreur (Distance Marge)</li>
-                            <li id="svm-step-3" class="p-2 rounded transition-colors duration-300">4. Optimisation (Mise à jour poids \( w \))</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Journal de calcul SVM -->
-                    <div id="svm-math-log" class="mt-4 bg-slate-900 text-green-400 p-3 rounded font-mono text-[10px] h-32 overflow-y-auto border border-slate-700">
-                        <div class="text-slate-500">// Journal des calculs SVM</div>
-                        <div>En attente de données...</div>
-                    </div>
-
-                    <div id="svm-ctrl-3d" class="hidden mt-4">
-                        <h4 class="font-bold text-teal-800 uppercase text-sm border-b pb-2 mb-2">Théorie : Kernel Trick</h4>
-                        <p class="text-xs text-slate-600 text-justify mb-2">
-                            Les données non séparables linéairement en 2D (cercles) peuvent l'être en 3D.
-                        </p>
-                        <ul class="text-xs text-slate-600 list-disc list-inside mb-2">
-                            <li><strong>Étape 1 :</strong> Mapping \( \phi(x,y) = (x, y, x^2+y^2) \)</li>
-                            <li><strong>Étape 2 :</strong> Séparation par un plan horizontal en 3D.</li>
-                            <li><strong>Étape 3 :</strong> La projection inverse donne un cercle en 2D.</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Canvas SVM -->
-                <div class="col-span-2 p-6 flex flex-col bg-white relative">
-                    <canvas id="svmCanvas" width="600" height="400" class="w-full h-auto shadow-inner border bg-slate-50 mb-4"></canvas>
-                    
-                    <!-- Affichage Dynamique Fonction -->
-                    <div class="bg-teal-50 border border-teal-100 rounded-lg p-4 text-sm text-slate-700">
-                        <h4 class="font-bold text-teal-800 mb-2"><i class="fa-solid fa-calculator mr-2"></i>Démonstration Dynamique</h4>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <p class="font-bold text-xs mb-1">Fonction de Décision Actuelle</p>
-                                <p class="font-mono text-xs text-teal-600" id="svm-eq-display">En attente...</p>
-                            </div>
-                            <div class="text-xs text-slate-500 italic">
-                                Observez l'équation changer à chaque étape de la descente de gradient.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Avantages / Limites SVM -->
-            <div class="grid md:grid-cols-2 gap-8 mb-12">
-                <div class="bg-white p-6 rounded-xl shadow border-t-4 border-teal-500">
-                    <h3 class="text-lg font-bold text-nuit mb-3">Avantages SVM</h3>
-                    <ul class="space-y-2 text-sm text-slate-600">
-                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i><strong>Précision :</strong> Très performant en haute dimension (ex: génétique, texte).</li>
-                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i><strong>Robustesse :</strong> La maximisation de la marge réduit le sur-apprentissage.</li>
-                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i><strong>Flexibilité :</strong> Grâce aux noyaux (Kernels) pour les problèmes complexes.</li>
-                    </ul>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow border-t-4 border-red-500">
-                    <h3 class="text-lg font-bold text-nuit mb-3">Limites SVM</h3>
-                    <ul class="space-y-2 text-sm text-slate-600">
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Lenteur :</strong> Difficile à entraîner sur de très grands datasets (O(n²)).</li>
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Bruit :</strong> Sensible si les classes se chevauchent beaucoup (Outliers).</li>
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Boîte Noire :</strong> Interprétabilité difficile avec des noyaux complexes.</li>
-                    </ul>
+                <div class="bg-white p-4 rounded-xl border space-y-4">
+                     <button onclick="svm_trainStep()" class="w-full bg-orange-500 text-white px-4 py-2 rounded font-bold mb-2">Entraîner (Pas)</button>
+                     <button onclick="svm_trainAuto()" id="btn-svm-auto" class="w-full bg-teal-600 text-white px-4 py-2 rounded font-bold mb-2">Auto</button>
+                     <button onclick="svm_generateRandom()" class="w-full bg-slate-200 text-slate-700 px-4 py-2 rounded font-bold">Reset</button>
+                     <div id="svm-math-log" class="bg-slate-900 text-green-400 p-2 rounded font-mono text-[10px] h-32 overflow-y-auto custom-scrollbar">Prêt...</div>
                 </div>
             </div>
         </div>
 
-        <!-- ONGLET 5 : APRIORI -->
+        <!-- 6. ARBRES -->
+        <div id="tab-tree" class="tab-content">
+            <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">Arbres de Décision</h2></div>
+            <div class="bg-green-50 p-6 rounded-xl border border-green-200 mb-6">
+                 <h4 class="font-bold text-green-900 mb-2">Théorie & Formules</h4>
+                 <div class="grid md:grid-cols-2 gap-4 text-xs">
+                     <div>
+                         <strong>Entropie (Shannon) :</strong> \( H(S) = - \sum_{i=1}^c p_i \log_2(p_i) \). Mesure l'impureté.<br>
+                         <strong>Gain d'Information :</strong> \( Gain(S, A) = H(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} H(S_v) \).<br>
+                         <strong>Algorithme ID3 :</strong> Choisir l'attribut maximisant le Gain à chaque étape.
+                     </div>
+                     <div>
+                         <span class="text-green-600 font-bold">Avantages :</span> Très interprétable (Règles), gère données mixtes, rapide.<br>
+                         <span class="text-red-600 font-bold">Limites :</span> Instable (variance), Sur-apprentissage (nécessite élagage/Pruning).
+                     </div>
+                 </div>
+             </div>
+            <div class="bg-white p-4 rounded-xl shadow border flex justify-center overflow-auto">
+                <div class="min-w-[600px] text-center">
+                    <h4 class="font-bold mb-4 text-sm text-slate-600">Simulation d'un Arbre Profond (Avant Élagage)</h4>
+                    <svg width="600" height="350">
+                        <!-- Niveau 1 -->
+                        <rect x="270" y="10" width="60" height="25" fill="#3b82f6" rx="4"/><text x="300" y="27" text-anchor="middle" fill="white" font-size="10">X1 ?</text>
+                        <line x1="300" y1="35" x2="150" y2="80" stroke="#cbd5e1" stroke-width="2"/><text x="200" y="50" font-size="9">Vrai</text>
+                        <line x1="300" y1="35" x2="450" y2="80" stroke="#cbd5e1" stroke-width="2"/><text x="400" y="50" font-size="9">Faux</text>
+                        
+                        <!-- Niveau 2 -->
+                        <rect x="120" y="80" width="60" height="25" fill="#fbbf24" rx="4"/><text x="150" y="97" text-anchor="middle" font-size="10">X2 ?</text>
+                        <rect x="420" y="80" width="60" height="25" fill="#fbbf24" rx="4"/><text x="450" y="97" text-anchor="middle" font-size="10">X3 ?</text>
+                        
+                        <!-- Branches N2 -->
+                        <line x1="150" y1="105" x2="80" y2="160" stroke="#cbd5e1"/><line x1="150" y1="105" x2="220" y2="160" stroke="#cbd5e1"/>
+                        <line x1="450" y1="105" x2="380" y2="160" stroke="#cbd5e1"/><line x1="450" y1="105" x2="520" y2="160" stroke="#cbd5e1"/>
+
+                        <!-- Niveau 3 -->
+                        <rect x="50" y="160" width="60" height="25" fill="#e2e8f0"/><text x="80" y="177" text-anchor="middle" font-size="10">Feuille</text>
+                        <rect x="190" y="160" width="60" height="25" fill="#22c55e"/><text x="220" y="177" text-anchor="middle" fill="white" font-size="10">OUI</text>
+                        <rect x="350" y="160" width="60" height="25" fill="#ef4444"/><text x="380" y="177" text-anchor="middle" fill="white" font-size="10">NON</text>
+                        <rect x="490" y="160" width="60" height="25" fill="#fbbf24" rx="4"/><text x="520" y="177" text-anchor="middle" font-size="10">X4 ?</text>
+
+                        <!-- Niveau 4 -->
+                        <line x1="520" y1="185" x2="480" y2="230" stroke="#cbd5e1" stroke-dasharray="4"/><line x1="520" y1="185" x2="560" y2="230" stroke="#cbd5e1" stroke-dasharray="4"/>
+                        <rect x="460" y="230" width="40" height="20" fill="#22c55e"/><text x="480" y="244" text-anchor="middle" fill="white" font-size="9">OUI</text>
+                        <rect x="540" y="230" width="40" height="20" fill="#ef4444"/><text x="560" y="244" text-anchor="middle" fill="white" font-size="9">NON</text>
+                        <text x="520" y="265" text-anchor="middle" font-size="9" fill="red" font-style="italic">(Candidats à l'élagage)</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. APRIORI -->
         <div id="tab-apriori" class="tab-content">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-900">Algorithme Apriori (Association)</h2>
-                <p class="text-slate-500">Extraction de motifs fréquents et règles d'association (Market Basket Analysis)</p>
-            </div>
-
-            <!-- THEORIE APRIORI -->
-            <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border-l-4 border-purple-600">
-                <h3 class="text-2xl font-bold text-nuit mb-6"><i class="fa-solid fa-book-open text-purple-600 mr-2"></i>Règles Mathématiques et Concepts</h3>
-                <div class="grid md:grid-cols-3 gap-6 text-sm">
-                    <div class="bg-slate-50 p-4 rounded border border-slate-200">
-                        <strong class="text-purple-800 block mb-2">1. Support (Fréquence)</strong>
-                        <p class="mb-2 text-slate-600">Proportion de transactions contenant un ensemble d'articles \(X\).</p>
-                        <div class="font-mono bg-white p-2 rounded border text-center text-xs">
-                            \( \text{Sup}(X) = \frac{\text{Freq}(X)}{N} \)
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded border border-slate-200">
-                        <strong class="text-purple-800 block mb-2">2. Confiance (Fiabilité)</strong>
-                        <p class="mb-2 text-slate-600">Probabilité d'acheter \(Y\) sachant qu'on a acheté \(X\).</p>
-                        <div class="font-mono bg-white p-2 rounded border text-center text-xs">
-                            \( \text{Conf}(X \to Y) = \frac{\text{Sup}(X \cup Y)}{\text{Sup}(X)} \)
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded border border-slate-200">
-                        <strong class="text-purple-800 block mb-2">3. Principe Apriori</strong>
-                        <p class="text-slate-600 text-justify text-xs">
-                            "Si un ensemble d'items est fréquent, alors tous ses sous-ensembles doivent être fréquents."
-                            <br>Inversement, si un item est rare, tous les suremsembles le contenant sont éliminés (élagage).
-                        </p>
-                    </div>
+            <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">Algorithme Apriori (Complet)</h2></div>
+            <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200 mb-6">
+                 <h4 class="font-bold text-yellow-900 mb-2">Théorie & Formules</h4>
+                 <div class="grid md:grid-cols-2 gap-4 text-xs">
+                     <div>
+                         <p><strong>Support :</strong> \( Supp(X) = \frac{\text{Freq}(X)}{N} \). Fréquence.</p>
+                         <p><strong>Confiance :</strong> \( Conf(A \to B) = \frac{Supp(A \cup B)}{Supp(A)} \). Probabilité conditionnelle.</p>
+                         <p><strong>Lift :</strong> \( Lift(A \to B) = \frac{Conf(A \to B)}{Supp(B)} \). (>1 : Lien Positif).</p>
+                     </div>
+                     <div>
+                         <p><strong>Principe :</strong> Anti-monotonie (Si X fréquent, sous-ensembles fréquents).</p>
+                         <p><i class="fa-solid fa-plus text-green-600"></i> Parallélisable. <i class="fa-solid fa-minus text-red-600"></i> Coûteux (Scan BDD multiples).</p>
+                     </div>
+                 </div>
+             </div>
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow border border-yellow-100">
+                    <label class="block text-xs font-bold mb-1">Min Support (%)</label>
+                    <input type="number" id="apr-minsup" value="20" class="w-full border p-2 rounded mb-4 font-bold text-center">
+                    <label class="block text-xs font-bold mb-1">Min Confiance (%)</label>
+                    <input type="number" id="apr-minconf" value="50" class="w-full border p-2 rounded mb-4 font-bold text-center">
+                    <button onclick="apr_generateDeepData()" class="w-full bg-slate-800 text-white py-2 rounded text-sm hover:bg-slate-700 mb-2">Générer 30 Transactions</button>
+                    <button onclick="apr_run()" class="w-full bg-yellow-600 text-white py-2 rounded text-sm font-bold hover:bg-yellow-700">Calculer Tout</button>
                 </div>
-            </div>
-
-            <!-- SIMULATION APRIORI -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 grid grid-cols-1 lg:grid-cols-3 gap-0 mb-12">
-                
-                <!-- Contrôles -->
-                <div class="p-6 bg-slate-50 border-r border-slate-200 flex flex-col h-full">
-                    <div class="space-y-4">
-                        <h4 class="font-bold text-purple-800 uppercase text-sm border-b border-purple-200 pb-2">Configuration</h4>
-                        
-                        <div class="space-y-2">
-                            <label class="text-xs font-bold text-slate-600">Min Support (%) :</label>
-                            <input type="number" id="apr-minsup" value="40" min="10" max="100" class="w-full p-2 border rounded font-mono text-center">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-xs font-bold text-slate-600">Min Confiance (%) :</label>
-                            <input type="number" id="apr-minconf" value="60" min="10" max="100" class="w-full p-2 border rounded font-mono text-center">
-                        </div>
-
-                        <div class="flex space-x-2 pt-2">
-                            <button onclick="apr_generateData()" class="flex-1 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 py-2 rounded text-xs font-bold"><i class="fa-solid fa-shuffle mr-1"></i> Données</button>
-                            <button onclick="apr_run()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded text-xs font-bold"><i class="fa-solid fa-play mr-1"></i> Exécuter</button>
+                <div class="col-span-2 flex flex-col gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow border h-40 overflow-y-auto border-slate-200">
+                        <h4 class="font-bold text-xs text-slate-500 uppercase mb-2">Base de Transactions</h4>
+                        <div id="apr-dataset-view" class="text-[10px] space-y-1 font-mono grid grid-cols-2 gap-x-4"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow border border-slate-200 h-[400px] overflow-hidden flex flex-col">
+                        <h4 class="font-bold text-slate-700 mb-2 border-b pb-2">Résultats : Candidats & Règles</h4>
+                        <div id="apr-results" class="flex-grow overflow-y-auto custom-scrollbar space-y-4 pr-2 text-xs">
+                            <div class="text-center text-slate-400 mt-20 italic">Générez des données et lancez l'analyse.</div>
                         </div>
                     </div>
-
-                    <!-- Dataset View -->
-                    <div class="mt-6 flex-grow overflow-hidden flex flex-col">
-                        <h4 class="font-bold text-slate-500 uppercase text-xs mb-2">Base de Transactions</h4>
-                        <div class="bg-white border border-slate-200 rounded overflow-y-auto h-48 p-2" id="apr-dataset-view">
-                            <!-- Transactions here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Visualisation -->
-                <div class="col-span-2 p-6 bg-white flex flex-col h-[500px]">
-                    <div class="flex justify-between items-center mb-4 border-b pb-2">
-                        <h4 class="font-bold text-purple-900"><i class="fa-solid fa-layer-group mr-2"></i>Déroulement de l'Algorithme</h4>
-                        <span id="apr-status" class="text-xs font-mono bg-purple-100 text-purple-700 px-2 py-1 rounded">Prêt</span>
-                    </div>
-                    
-                    <div class="flex-grow overflow-y-auto space-y-4" id="apr-results">
-                        <div class="text-center text-slate-400 mt-20 italic">
-                            Générez des données puis cliquez sur Exécuter pour voir l'élagage.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Avantages / Limites Apriori -->
-            <div class="grid md:grid-cols-2 gap-8 mb-12">
-                <div class="bg-white p-6 rounded-xl shadow border-t-4 border-purple-500">
-                    <h3 class="text-lg font-bold text-nuit mb-3">Avantages & Cas d'usage</h3>
-                    <ul class="space-y-2 text-sm text-slate-600">
-                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i><strong>Intuitif :</strong> Règles faciles à comprendre (Si A alors B).</li>
-                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i><strong>Exhaustif :</strong> Trouve tous les itemsets fréquents respectant le seuil.</li>
-                        <li class="mt-2 font-bold text-purple-900">Applications :</li>
-                        <ul class="list-disc list-inside pl-4 text-xs">
-                            <li>Grande distribution (Disposition des rayons)</li>
-                            <li>Recommandation web (Amazon: "Souvent achetés ensemble")</li>
-                            <li>Analyse médicale (Co-occurence de symptômes)</li>
-                        </ul>
-                    </ul>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow border-t-4 border-red-500">
-                    <h3 class="text-lg font-bold text-nuit mb-3">Limites de l'Algorithme</h3>
-                    <ul class="space-y-2 text-sm text-slate-600">
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Coût de calcul :</strong> Nécessite plusieurs passes sur la base de données (I/O intensif).</li>
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Explosion combinatoire :</strong> Génère énormément de candidats si le seuil de support est bas.</li>
-                        <li><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i><strong>Alternative :</strong> L'algorithme <em>FP-Growth</em> est souvent plus rapide (pas de génération de candidats).</li>
-                    </ul>
                 </div>
             </div>
         </div>
 
-        <!-- ONGLET 6 : EXAMEN (CORRIGÉ 2021) -->
+        <!-- 8. BAYES -->
+        <div id="tab-bayes" class="tab-content">
+             <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">Réseaux Bayésiens & Naïf</h2></div>
+             <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 mb-6">
+                 <h4 class="font-bold text-blue-900 mb-2">Support Théorique</h4>
+                 <div class="text-xs space-y-1">
+                     <p><strong>Théorème de Bayes :</strong> \( P(A|B) = \frac{P(B|A)P(A)}{P(B)} \).</p>
+                     <p><strong>Bayes Naïf :</strong> Suppose l'indépendance entre attributs. \( P(C|X) \propto P(C) \prod P(x_i|C) \).</p>
+                     <p><i class="fa-solid fa-plus text-green-600"></i> Très efficace pour le texte (Spam), gère données manquantes.</p>
+                 </div>
+             </div>
+             <div class="grid lg:grid-cols-3 gap-6 mb-8">
+                 <div class="col-span-2 bg-white p-6 rounded-xl shadow border border-slate-200 relative h-[350px]">
+                     <!-- Centered Graph -->
+                     <div class="absolute inset-0 flex items-center justify-center">
+                         <div class="relative w-[300px] h-[200px]">
+                             <svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+                                 <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#cbd5e1" /></marker></defs>
+                                 <line x1="150" y1="40" x2="80" y2="140" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow)"/>
+                                 <line x1="150" y1="40" x2="220" y2="140" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow)"/>
+                             </svg>
+                             <div class="absolute top-0 left-[110px] w-24 p-2 bg-red-100 border-2 border-red-300 rounded-lg text-center cursor-pointer z-20" onclick="toggleBnNode('spam')">
+                                 <div class="font-bold text-xs">SPAM</div><div class="text-[9px] text-red-700" id="node-spam-val">P=0.4</div>
+                             </div>
+                             <div class="absolute bottom-0 left-0 w-24 p-2 bg-blue-100 border-2 border-blue-300 rounded-lg text-center cursor-pointer z-20" onclick="toggleBnNode('money')">
+                                 <div class="font-bold text-xs">Argent</div><div class="text-[9px] text-blue-700" id="node-money-val">Obs?</div>
+                             </div>
+                             <div class="absolute bottom-0 right-0 w-24 p-2 bg-blue-100 border-2 border-blue-300 rounded-lg text-center cursor-pointer z-20" onclick="toggleBnNode('urgent')">
+                                 <div class="font-bold text-xs">Urgent</div><div class="text-[9px] text-blue-700" id="node-urgent-val">Obs?</div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="bg-white p-6 rounded-xl shadow border space-y-4">
+                     <h4 class="font-bold text-slate-800">Inférence</h4>
+                     <div id="bn-results" class="text-sm bg-slate-50 p-3 rounded border">Cliquez sur un noeud...</div>
+                     <button onclick="resetBn()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded text-sm font-bold">Réinitialiser</button>
+                 </div>
+             </div>
+        </div>
+
+        <!-- 9. EXERCICES -->
+        <div id="tab-exos" class="tab-content">
+            <div class="text-center mb-8"><h2 class="text-3xl font-bold text-slate-900">Banque d'Exercices Corrigés</h2></div>
+            <div class="max-w-4xl mx-auto space-y-6" id="exos-container">
+                <!-- Rempli par JS -->
+            </div>
+        </div>
+
+        <!-- 10. CORRIGÉ GHARDAIA -->
+        <div id="tab-exam-ghardaia" class="tab-content space-y-12">
+            <div class="text-center border-b pb-6"><h2 class="text-3xl font-extrabold text-slate-900">Corrigé Concours Ghardaïa 2021</h2></div>
+            
+            <!-- Ex 1 Arbres -->
+            <section class="bg-white p-6 rounded-xl shadow border-l-4 border-sky-500">
+                <h3 class="font-bold text-xl text-sky-900 mb-4">Ex 1: Arbres de Décision (04 pts)</h3>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="text-sm space-y-3">
+                        <div class="pedago-box">
+                            <div class="pedago-header">1. Données & Formules</div>
+                            <p><strong>Dataset :</strong> 14 Exemples (9 Oui, 5 Non).</p>
+                            <p><strong>Formule Entropie :</strong> \( I(D) = - \sum p_i \log_2(p_i) \)</p>
+                            <p><strong>Formule Gain :</strong> \( Gain(A) = I(D) - \sum \frac{|D_j|}{|D|} I(D_j) \)</p>
+                        </div>
+                        <div class="pedago-box">
+                            <div class="pedago-header">2. Calculs Détaillés (Racine)</div>
+                            <p><strong>Entropie Globale :</strong> \( I(D) = -(9/14)\log(9/14) - (5/14)\log(5/14) = \mathbf{0.940} \)</p>
+                            <p class="mt-2 font-bold underline">Gain pour Age :</p>
+                            <ul class="list-disc list-inside text-xs">
+                                <li>Petit (5ex: 2Y, 3N) : \( I = -(2/5)\log(2/5)-(3/5)\log(3/5) = 0.971 \)</li>
+                                <li>Moyen (4ex: 4Y, 0N) : \( I = 0 \) (Pur)</li>
+                                <li>Sénior (5ex: 3Y, 2N) : \( I = 0.971 \)</li>
+                            </ul>
+                            <p>\( Info_{Age} = \frac{5}{14}(0.971) + 0 + \frac{5}{14}(0.971) = 0.693 \)</p>
+                            <p class="text-green-700 font-bold">\( Gain(Age) = 0.940 - 0.693 = 0.247 \) (Max)</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h4 class="font-bold mb-2 text-slate-500">Arbre Résultant</h4>
+                        <canvas id="ghardaiaTreeCanvas" width="350" height="300"></canvas>
+                        <div class="mt-4 text-xs bg-yellow-50 p-2 border rounded w-full">
+                            <strong>Interprétation :</strong> L'âge est le facteur discriminant principal.
+                            Si Age=Moyen, on achète sûr. Si Petit, cela dépend si Etudiant.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ex 2 SVM -->
+            <section class="bg-white p-6 rounded-xl shadow border-l-4 border-teal-500">
+                <h3 class="font-bold text-xl text-teal-900 mb-4">Ex 2: SVM - Résolution Analytique</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="text-sm">
+                        <div class="pedago-box">
+                            <div class="pedago-header">1. Posé du Problème</div>
+                            <p>Vecteurs Supports identifiés : \(S_1(1,0) [-1]\), \(S_2(3,1) [+1]\), \(S_3(3,-1) [+1]\).</p>
+                            <p>On résout le système Dual avec les contraintes KKT :</p>
+                            <ul class="list-disc list-inside text-xs mt-1">
+                                <li>\( \sum \alpha_i y_i = 0 \)</li>
+                                <li>\( y_i (w \cdot x_i + b) = 1 \) pour les supports.</li>
+                            </ul>
+                        </div>
+                        <div class="pedago-box">
+                            <div class="pedago-header">2. Système d'Équations</div>
+                            <p>(E1) \( -\alpha_1 + \alpha_2 + \alpha_3 = 0 \)</p>
+                            <p>(E2) \( -1(1w_x + 0w_y + b) = 1 \Rightarrow -w_x - b = 1 \)</p>
+                            <p>(E3) \( 1(3w_x + 1w_y + b) = 1 \)</p>
+                            <p>(E4) \( 1(3w_x - 1w_y + b) = 1 \)</p>
+                        </div>
+                    </div>
+                    <div class="text-sm">
+                        <div class="pedago-box">
+                            <div class="pedago-header">3. Résolution Pas-à-Pas</div>
+                            <p><strong>Step A:</strong> (E3) + (E4) : \( 6w_x + 2b = 2 \Rightarrow 3w_x + b = 1 \).</p>
+                            <p><strong>Step B:</strong> On a (E2) : \( -w_x - b = 1 \).</p>
+                            <p><strong>Step C:</strong> Somme A+B : \( 2w_x = 2 \Rightarrow \mathbf{w_x = 1} \).</p>
+                            <p><strong>Step D:</strong> Subst dans (E2) : \( -1 - b = 1 \Rightarrow \mathbf{b = -2} \).</p>
+                            <p><strong>Step E:</strong> (E3) - (E4) : \( 2w_y = 0 \Rightarrow \mathbf{w_y = 0} \).</p>
+                        </div>
+                        <div class="bg-green-50 p-2 rounded border border-green-200 text-center font-bold text-green-800">
+                            Résultat Final : Hyperplan \( x = 2 \)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ex 3 Clustering -->
+            <section class="bg-white p-6 rounded-xl shadow border-l-4 border-purple-500">
+                <h3 class="font-bold text-xl text-purple-900 mb-4">Ex 3: K-Means & HCA (Analytique & Visuel)</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold text-sm mb-2 text-center text-purple-800">K-Means (1D)</h4>
+                        <div class="text-xs bg-slate-50 p-2 mb-2 rounded font-mono">
+                            D = {2, 5, 8, 10, 11, 18, 20}. K=3.<br>
+                            Init: C1=8, C2=10, C3=11.<br>
+                            <strong>Iter 1:</strong><br>
+                            - 2,5,8 -> C1 (Moy=5)<br>
+                            - 10 -> C2 (Moy=10)<br>
+                            - 11,18,20 -> C3 (Moy=16.3)<br>
+                            <strong>Iter 2 (Stable):</strong> C1={2,5,8}, C2={10,11}, C3={18,20}.
+                        </div>
+                        <canvas id="ghardaiaKmeansCanvas" width="300" height="150" class="bg-white border rounded"></canvas>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm mb-2 text-center text-purple-800">HCA (Dendrogramme)</h4>
+                        <div class="text-xs bg-slate-50 p-2 mb-2 rounded font-mono">
+                            Dist (Single Linkage): min(|a-b|).<br>
+                            1. {10,11} (d=1)<br>
+                            2. {18,20} (d=2)<br>
+                            3. {8} et {10,11} (d=2)<br>
+                            4. {2,5} (d=3)
+                        </div>
+                        <canvas id="ghardaiaHcaCanvas" width="300" height="150" class="bg-white border rounded"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 11. CORRIGÉ SÉTIF -->
         <div id="tab-exam" class="tab-content space-y-12">
-            <div class="text-center space-y-4">
-                <h2 class="text-3xl font-extrabold text-slate-900">Corrigé Concours Doctorat - Sétif 2021/2022</h2>
-                <p class="text-slate-500">Spécialité : Intelligence Artificielle | Épreuve : Fouille de Données</p>
-            </div>
-
-            <!-- EXERCICE 1 -->
-            <section class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                <div class="bg-indigo-900 px-6 py-3 border-b-4 border-orange-500 flex justify-between items-center text-white">
-                    <h3 class="font-bold text-lg"><i class="fa-solid fa-clipboard-question mr-2 text-orange-custom"></i>Exercice 1 : Concepts & Distances (4 pts)</h3>
+             <div class="text-center border-b pb-6"><h2 class="text-3xl font-extrabold text-slate-900">Corrigé Concours Sétif 2021</h2></div>
+             
+             <!-- Ex 2 SVM -->
+             <div class="bg-white p-6 rounded-xl shadow border-l-4 border-teal-500">
+                <h3 class="font-bold text-lg text-teal-800 mb-4">Ex 2: SVM (Calcul de Transformation)</h3>
+                <div class="pedago-box">
+                    <div class="pedago-header">1. Données & Transformation</div>
+                    <p class="text-sm">Points 1D : \( x_1=0 \) (Classe -1), \( x_2=2 \) (Classe +1).</p>
+                    <p class="text-sm">Mapping : \( \Phi(x) = [1, 2x, x^2]^T \).</p>
                 </div>
-                <div class="p-6 grid md:grid-cols-2 gap-8">
-                    <!-- Q1-Q3 Théorie -->
-                    <div class="space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 hover:shadow-md transition">
-                            <h4 class="font-bold text-sm text-indigo-900 mb-2">1. Inconvénient majeur Apriori ?</h4>
-                            <p class="text-xs text-slate-600 mb-2">L'algorithme doit scanner la base de données plusieurs fois pour compter les supports des candidats.</p>
-                            <div class="bg-red-50 text-red-700 text-xs p-2 rounded border border-red-100">
-                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>Coût :</strong> Génère un nombre exponentiel de candidats et nécessite \( K \) scans de la BDD.
-                            </div>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 hover:shadow-md transition">
-                            <h4 class="font-bold text-sm text-indigo-900 mb-2">2. Algorithme de Clustering Flou ?</h4>
-                            <p class="text-xs text-slate-600">"Data point can belong to more than one cluster with a likelihood..."</p>
-                            <div class="bg-green-50 text-green-700 text-xs p-2 rounded border border-green-100 mt-2 font-bold">
-                                <i class="fa-solid fa-check mr-1"></i> Fuzzy C-Means (FCM)
-                            </div>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 hover:shadow-md transition">
-                            <h4 class="font-bold text-sm text-indigo-900 mb-2">3. Problème des centres initiaux K-means ?</h4>
-                            <p class="text-xs text-slate-600">Le choix aléatoire peut mener à des minimums locaux (mauvaise convergence).</p>
-                        </div>
+                <div class="pedago-box">
+                    <div class="pedago-header">2. Calculs Détaillés</div>
+                    <p class="text-sm font-mono">
+                        \( \Phi(0) = [1, 0, 0] \)<br>
+                        \( \Phi(2) = [1, 4, 4] \)<br>
+                        Vecteur direction \( \vec{v} = \Phi(2) - \Phi(0) = [0, 4, 4] \).<br>
+                        Norme \( ||\vec{v}|| = \sqrt{0^2 + 4^2 + 4^2} = \sqrt{32} = 4\sqrt{2} \).<br>
+                        Marge \( M = ||\vec{v}|| / 2 = 2\sqrt{2} \).
+                    </p>
+                </div>
+                <div class="pedago-box">
+                    <div class="pedago-header">3. Résultat</div>
+                    <p class="text-sm">Vecteur poids optimal : \( w = [0, 0.25, 0.25] \).<br>Biais : \( b = -1 \).</p>
+                </div>
+             </div>
+
+             <!-- Ex 3 Apriori -->
+             <div class="bg-white p-6 rounded-xl shadow border-l-4 border-purple-500">
+                <h3 class="font-bold text-lg text-purple-800 mb-4">Ex 3: Apriori (Simulation)</h3>
+                <div class="pedago-box">
+                    <div class="pedago-header">Données & Paramètres</div>
+                    <p class="text-sm">MinSup = 60% (3/5). Transactions: T1(P,F,O,J), T2(P,F,J)...</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-xs font-mono">
+                    <div class="bg-white p-2 border">
+                        <strong>L1 (Fréquents 1-item):</strong><br>
+                        P:3, F:3, J:4, L:3 (O et Y < 3 rejetés).
                     </div>
-                    
-                    <!-- Q4 Distance Minkowski Visualisation -->
-                    <div class="bg-white p-4 rounded-lg border border-slate-200 relative">
-                        <h4 class="font-bold text-sm text-indigo-900 mb-4">4. Distances de Minkowski (p=1 vs p=2)</h4>
-                        <div class="relative h-48 w-full bg-slate-50 rounded border border-slate-200 flex justify-center items-center">
-                            <div class="absolute inset-0 grid grid-cols-6 grid-rows-6 opacity-10 pointer-events-none" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 20px 20px;"></div>
-                            <div class="absolute w-3 h-3 bg-blue-600 rounded-full" style="left: 20%; bottom: 20%;"><span class="absolute -bottom-4 -left-2 text-xs font-bold">A</span></div>
-                            <div class="absolute w-3 h-3 bg-red-600 rounded-full" style="left: 80%; bottom: 80%;"><span class="absolute -top-5 -left-2 text-xs font-bold">B</span></div>
-                            <div class="absolute border-l-2 border-b-2 border-orange-500 border-dashed" style="left: 20%; bottom: 20%; width: 60%; height: 60%;"></div>
-                            <span class="absolute text-orange-600 text-[10px] font-bold bg-white px-1" style="left: 50%; bottom: 20%;">p=1 (Manhattan)</span>
-                            <svg class="absolute inset-0 w-full h-full pointer-events-none">
-                                <line x1="20%" y1="80%" x2="80%" y2="20%" stroke="#4f46e5" stroke-width="2" />
-                            </svg>
-                            <span class="absolute text-indigo-600 text-[10px] font-bold bg-white px-1" style="left: 45%; top: 45%; transform: rotate(-45deg);">p=2 (Euclidienne)</span>
-                        </div>
-                        <div class="mt-2 text-xs text-slate-600">
-                            <ul class="list-disc list-inside">
-                                <li><strong>p = 1 :</strong> Distance de Manhattan \( |x_1 - x_2| + |y_1 - y_2| \)</li>
-                                <li><strong>p = 2 :</strong> Distance Euclidienne \( \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2} \)</li>
-                            </ul>
-                        </div>
+                    <div class="bg-white p-2 border">
+                        <strong>L2 (Fréquents 2-items):</strong><br>
+                        Génération C2: {PF, PJ, PL, FJ, FL, JL}<br>
+                        Comptage: PF(2), PJ(3), PL(1)...<br>
+                        Seul <strong>{P, J}</strong> est gardé (Sup=3).
                     </div>
                 </div>
-            </section>
-
-            <!-- EXERCICE 2 : SVM DÉTAILLÉ -->
-            <section class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                <div class="bg-teal-800 px-6 py-3 border-b-4 border-orange-500 flex justify-between items-center text-white">
-                    <h3 class="font-bold text-lg"><i class="fa-solid fa-vector-square mr-2 text-orange-custom"></i>Exercice 2 : SVM & Noyau (8 pts) - Résolution Détaillée</h3>
+                <div class="mt-4 bg-green-50 p-2 border border-green-200 text-sm font-bold text-center">
+                    Règle Forte : P -> J (Confiance 100%)
                 </div>
-                <div class="p-6 grid md:grid-cols-2 gap-8">
-                    <!-- Partie Gauche : Déroulement Pédagogique -->
-                    <div class="space-y-4 font-mono text-xs text-slate-700 h-[600px] overflow-y-auto pr-2">
-                        
-                        <!-- Etape 0 : Comprendre l'énoncé -->
-                        <div class="bg-yellow-50 p-4 rounded border border-yellow-200">
-                            <h4 class="font-bold text-yellow-900 text-sm mb-2 border-b border-yellow-200 pb-1">0. Analyse de l'Énoncé (Décodage)</h4>
-                            <p class="mb-2"><strong>Ce qu'on nous donne :</strong></p>
-                            <ul class="list-disc list-inside space-y-1 mb-2">
-                                <li><strong>Points (1D) :</strong> \( x_1=0 \) (Classe -1), \( x_2=2 \) (Classe +1).</li>
-                                <li><strong>Fonction de Transformation (\( \phi \)) :</strong> C'est la recette pour passer de 1D à 3D. <br>\( \phi(x) = [1, 2x, x^2]^T \).</li>
-                            </ul>
-                            <p class="text-slate-500 italic">"T" signifie transposée (vecteur colonne).</p>
-                        </div>
-
-                        <!-- Etape 1 : Calculs Points -->
-                        <div class="bg-white p-4 rounded border border-slate-200">
-                            <h4 class="font-bold text-teal-800 text-sm mb-2">Q1. Calcul des points transformés \( \phi(x) \)</h4>
-                            <p class="mb-2">On remplace simplement \( x \) dans la formule \( [1, 2x, x^2] \).</p>
-                            <div class="space-y-2 pl-2 border-l-2 border-teal-500">
-                                <div>
-                                    <strong>Pour \( x_1 = 0 \) :</strong><br>
-                                    \( \phi(0) = [1, 2(0), 0^2] = [1, 0, 0] \)
-                                </div>
-                                <div>
-                                    <strong>Pour \( x_2 = 2 \) :</strong><br>
-                                    \( \phi(2) = [1, 2(2), 2^2] = [1, 4, 4] \)
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Etape 2 : Vecteur w -->
-                        <div class="bg-white p-4 rounded border border-slate-200">
-                            <h4 class="font-bold text-teal-800 text-sm mb-2">Q2. Vecteur parallèle à w</h4>
-                            <p class="mb-2"><strong>Théorie :</strong> Dans un SVM parfait (Hard Margin), le vecteur \( w \) est perpendiculaire à l'hyperplan qui sépare les deux classes. Pour deux points, la direction optimale est simplement le vecteur qui relie ces deux points (leur différence).</p>
-                            <p class="mb-1 font-bold">Calcul :</p>
-                            <p>\( \vec{v} = \phi(x_2) - \phi(x_1) \)</p>
-                            <p>\( \vec{v} = [1, 4, 4] - [1, 0, 0] = [0, 4, 4] \)</p>
-                        </div>
-
-                        <!-- Etape 3 : Marge -->
-                        <div class="bg-white p-4 rounded border border-slate-200">
-                            <h4 class="font-bold text-teal-800 text-sm mb-2">Q3. Valeur de la Marge</h4>
-                            <p class="mb-2"><strong>Théorie :</strong> La marge est la distance du milieu jusqu'à un point. C'est donc la moitié de la distance totale entre les deux points.</p>
-                            <p class="mb-1"><strong>1. Distance totale (\( ||\vec{v}|| \)) :</strong></p>
-                            <p>\( \sqrt{(0)^2 + (4)^2 + (4)^2} = \sqrt{0 + 16 + 16} = \sqrt{32} \)</p>
-                            <p>Simplification : \( \sqrt{16 \times 2} = 4\sqrt{2} \)</p>
-                            <p class="mb-1 mt-2"><strong>2. Marge (Moitié) :</strong></p>
-                            <p>\( M = \frac{4\sqrt{2}}{2} = 2\sqrt{2} \approx 2.828 \)</p>
-                        </div>
-
-                        <!-- Etape 4 : Trouver w -->
-                        <div class="bg-white p-4 rounded border border-slate-200">
-                            <h4 class="font-bold text-teal-800 text-sm mb-2">Q4. Trouver le vecteur w exact</h4>
-                            <p class="mb-2"><strong>Théorie :</strong> L'énoncé donne la clé : \( M = \frac{1}{||w||} \). Donc \( ||w|| = \frac{1}{M} \).</p>
-                            <p>On sait que \( w \) est parallèle à \( [0, 4, 4] \), donc \( w \) est de la forme \( k \times [0, 1, 1] \).</p>
-                            <p class="mt-2"><strong>Calcul de k :</strong></p>
-                            <p>Norme de \( w \) = \( k \sqrt{0^2+1^2+1^2} = k\sqrt{2} \)</p>
-                            <p>On veut \( ||w|| = \frac{1}{2\sqrt{2}} \)</p>
-                            <p>Donc \( k\sqrt{2} = \frac{1}{2\sqrt{2}\sqrt{2}} = \frac{1}{4} = 0.25 \)</p>
-                            <p class="mt-2 text-green-600 font-bold">Résultat : \( w = 0.25 \times [0, 1, 1] = [0, 0.25, 0.25] \)</p>
-                        </div>
-                        
-                        <!-- Etape 5 : Trouver w0 -->
-                        <div class="bg-white p-4 rounded border border-slate-200">
-                            <h4 class="font-bold text-teal-800 text-sm mb-2">Q5. Trouver \( w_0 \) (Biais)</h4>
-                            <p class="mb-2"><strong>Théorie :</strong> Pour un vecteur de support \( x_s \) (sur la marge), on a \( w^T \phi(x_s) + w_0 = y_s \) (où \( y_s \) est +1 ou -1).</p>
-                            <p>Prenons \( x_2 \) (classe +1) :</p>
-                            <p>\( w^T \phi(x_2) + w_0 = 1 \)</p>
-                            <p>\( [0, 0.25, 0.25] \cdot [1, 4, 4] + w_0 = 1 \)</p>
-                            <p>\( (0\times1) + (0.25\times4) + (0.25\times4) + w_0 = 1 \)</p>
-                            <p>\( 0 + 1 + 1 + w_0 = 1 \)</p>
-                            <p>\( 2 + w_0 = 1 \Rightarrow w_0 = -1 \)</p>
-                        </div>
-                    </div>
-
-                    <!-- Visualisation 3D Simplifiée -->
-                    <div class="bg-slate-900 rounded-lg p-4 flex flex-col items-center justify-center relative h-full min-h-[300px]">
-                        <!-- Canvas 3D simulé -->
-                        <canvas id="examSvmCanvas" width="300" height="250" class="bg-slate-800 rounded shadow-inner mb-4"></canvas>
-                        
-                        <!-- Légende déplacée en bas centrée -->
-                        <div class="text-[10px] text-slate-400 text-center font-bold border-t border-slate-700 pt-2 w-full">
-                            Espace de redimensionnement (Feature Space)<br>
-                            <span class="font-normal">Le plan sépare \( \phi(x_1) \) (Rouge) et \( \phi(x_2) \) (Bleu).</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- EXERCICE 3 -->
-            <section class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden mb-12">
-                <div class="bg-emerald-800 px-6 py-3 border-b-4 border-orange-500 flex justify-between items-center text-white">
-                    <h3 class="font-bold text-lg"><i class="fa-solid fa-cart-shopping mr-2 text-orange-custom"></i>Exercice 3 : Apriori (8 pts) - Résolution Détaillée</h3>
-                </div>
-                <div class="p-6">
-                    <!-- Section Théorique Avant Calcul -->
-                    <div class="mb-6 bg-emerald-50 p-4 rounded border border-emerald-100">
-                        <h4 class="font-bold text-emerald-900 text-sm mb-2"><i class="fa-solid fa-book mr-2"></i>Règles Mathématiques et Méthodologie</h4>
-                        <div class="grid md:grid-cols-2 gap-4 text-xs text-slate-700">
-                            <div>
-                                <strong class="block mb-1 text-emerald-700">1. Support (Fréquence) :</strong>
-                                <p class="mb-2">Le support d'un itemset \(X\) est la proportion de transactions contenant \(X\).</p>
-                                <div class="bg-white p-2 rounded border border-emerald-200 font-mono text-center">
-                                    \( \text{Sup}(X) = \frac{\text{Nb transactions avec } X}{\text{Nb total transactions } (N)} \)
-                                </div>
-                                <p class="mt-2 text-[10px] text-slate-500">Ici, on utilise souvent le support absolu (nombre d'occurrences) pour simplifier les calculs manuels (ex: MinSup = 50% de 5 = 2.5 donc 3).</p>
-                            </div>
-                            <div>
-                                <strong class="block mb-1 text-emerald-700">2. Confiance (Règle) :</strong>
-                                <p class="mb-2">La confiance d'une règle \(A \rightarrow B\) mesure la probabilité de voir \(B\) sachant qu'on a vu \(A\).</p>
-                                <div class="bg-white p-2 rounded border border-emerald-200 font-mono text-center">
-                                    \( \text{Conf}(A \rightarrow B) = \frac{\text{Sup}(A \cup B)}{\text{Sup}(A)} \)
-                                </div>
-                                <p class="mt-2 text-[10px] text-slate-500">Si Confiance > MinConf, la règle est valide (forte).</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col md:flex-row gap-6">
-                        <!-- Données -->
-                        <div class="w-full md:w-1/3 space-y-4">
-                            <table class="w-full text-xs border border-slate-200">
-                                <thead class="bg-slate-100"><tr><th class="p-2 border">TID</th><th class="p-2 border">Items</th></tr></thead>
-                                <tbody>
-                                    <tr><td class="p-1 border text-center">1</td><td class="p-1 border">P, F, O, J</td></tr>
-                                    <tr><td class="p-1 border text-center">2</td><td class="p-1 border">P, F, J</td></tr>
-                                    <tr><td class="p-1 border text-center">3</td><td class="p-1 border">L, Y, F</td></tr>
-                                    <tr><td class="p-1 border text-center">4</td><td class="p-1 border">P, J, L</td></tr>
-                                    <tr><td class="p-1 border text-center">5</td><td class="p-1 border">J, L</td></tr>
-                                </tbody>
-                            </table>
-                            <div class="text-center">
-                                <button onclick="runExamApriori()" class="w-full bg-orange-custom text-white py-2 rounded shadow font-bold hover:bg-orange-600 transition"><i class="fa-solid fa-play mr-2"></i> Lancer la Simulation Pas-à-Pas</button>
-                            </div>
-                        </div>
-
-                        <!-- Résultat Animé -->
-                        <div class="w-full md:w-2/3 bg-slate-50 border border-slate-200 rounded p-4 h-96 overflow-y-auto font-mono text-xs" id="apriori-log">
-                            <div class="text-slate-400 italic text-center mt-32">
-                                <i class="fa-solid fa-arrow-left mr-2"></i> Cliquez sur le bouton pour voir l'application numérique détaillée.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+             </div>
         </div>
 
-        <!-- ONGLET 7 : EXAMEN 2022 (CORRIGÉ USTO) -->
+        <!-- 12. CORRIGÉ USTO -->
         <div id="tab-exam-22" class="tab-content space-y-12">
-            <div class="text-center space-y-2 border-b pb-6">
-                <h2 class="text-3xl font-extrabold text-slate-900">Corrigé Doctorat USTO 2022/2023</h2>
-                <p class="text-emerald-600 font-medium">Spécialité : IA | Épreuve : Apprentissage Automatique</p>
+            <div class="text-center border-b pb-6"><h2 class="text-3xl font-extrabold text-slate-900">Corrigé Concours USTO 2022</h2></div>
+            
+            <!-- Ex 1 KNN -->
+            <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500">
+                <h3 class="font-bold text-lg text-blue-800 mb-2">Ex 1 : k-NN (Calcul de Distances)</h3>
+                <div class="pedago-box">
+                    <div class="pedago-header">Données & Formule</div>
+                    <p class="text-sm">T1(2,4,4), T3(2,2,2), T5(5,5,5). Test T2(1,5,5).<br>Distance Manhattan : \( d = \sum |x_i - y_i| \).</p>
+                </div>
+                <div class="pedago-box">
+                    <div class="pedago-header">Calculs</div>
+                    <ul class="text-sm font-mono list-disc list-inside">
+                        <li>d(T2, T1) = |1-2| + |5-4| + |5-4| = 1 + 1 + 1 = <strong>3</strong></li>
+                        <li>d(T2, T3) = |1-2| + |5-2| + |5-2| = 1 + 3 + 3 = 7</li>
+                        <li>d(T2, T5) = |1-5| + |5-5| + |5-5| = 4 + 0 + 0 = 4</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-2 border border-green-200 text-center font-bold text-sm">
+                    Résultat : T2 est classé comme T1 (Isocèle).
+                </div>
             </div>
 
-            <!-- EX 1: Triangles & MLP -->
-            <section class="bg-white rounded-xl shadow-lg border border-emerald-100 overflow-hidden">
-                <div class="bg-emerald-800 px-6 py-3 flex justify-between items-center text-white">
-                    <h3 class="font-bold"><i class="fa-solid fa-shapes mr-2"></i>Ex 1: Classification Triangles (7pts)</h3>
+            <!-- Ex 2 Clustering -->
+            <div class="bg-white p-6 rounded-xl shadow border-l-4 border-indigo-500">
+                <h3 class="font-bold text-lg text-indigo-800 mb-2">Ex 2 : Clustering (Normalisation)</h3>
+                <div class="pedago-box">
+                    <div class="pedago-header">Données & Formule</div>
+                    <p class="text-sm">Salaire (10k-110k), Enfants (1-5).<br>MinMax : \( v' = \frac{v - min}{max - min} \).</p>
                 </div>
-                <div class="p-6 grid lg:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <div class="bg-emerald-50 p-3 rounded text-xs text-slate-700">
-                            <strong>Base d'apprentissage :</strong><br>
-                            T1 (2,4,4) : Isocèle (Classe 1)<br>
-                            T3 (2,2,2) : Équilatéral (Classe 2)<br>
-                            T5 (5,5,5) : Équilatéral (Classe 2)<br>
-                            <strong>Test :</strong> T2 (1,5,5) (Iso), T4 (1,1,1) (Equi)
-                        </div>
-                        <div class="border-l-4 border-emerald-500 pl-3">
-                            <h4 class="font-bold text-sm text-emerald-800">Q3.a : Classification k-NN (k=1, Manhattan)</h4>
-                            <div class="text-xs font-mono mt-2 space-y-2">
-                                <p><strong>Test T2 (1,5,5) :</strong></p>
-                                <ul class="ml-2">
-                                    <li>d(T2, T1[2,4,4]) = |1-2|+|5-4|+|5-4| = 1+1+1 = 3</li>
-                                    <li>d(T2, T3[2,2,2]) = |1-2|+|5-2|+|5-2| = 1+3+3 = 7</li>
-                                    <li>d(T2, T5[5,5,5]) = |1-5|+|5-5|+|5-5| = 4+0+0 = 4</li>
-                                </ul>
-                                <p class="text-emerald-700 font-bold">-> Plus proche : T1 (Isocèle). Donc T2 est Isocèle.</p>
-                                
-                                <p class="mt-2"><strong>Test T4 (1,1,1) :</strong></p>
-                                <ul class="ml-2">
-                                    <li>d(T4, T1) = |1-2|+|1-4|+|1-4| = 1+3+3 = 7</li>
-                                    <li>d(T4, T3) = |1-2|+|1-2|+|1-2| = 1+1+1 = 3</li>
-                                    <li>d(T4, T5) = 4+4+4 = 12</li>
-                                </ul>
-                                <p class="text-emerald-700 font-bold">-> Plus proche : T3 (Équilatéral). Donc T4 est Équilatéral.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Visualisation MLP -->
-                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded border p-4">
-                        <h4 class="text-xs font-bold text-slate-500 mb-2">Q3.b : Architecture MLP proposée</h4>
-                        <!-- Simple SVG MLP -->
-                        <svg width="200" height="150" viewBox="0 0 200 150">
-                            <!-- Input -->
-                            <circle cx="30" cy="40" r="10" fill="#cbd5e1" /><text x="15" y="45" font-size="8">x1</text>
-                            <circle cx="30" cy="110" r="10" fill="#cbd5e1" /><text x="15" y="115" font-size="8">x2</text>
-                            <!-- Hidden -->
-                            <circle cx="100" cy="75" r="12" fill="#bae6fd" stroke="#0ea5e9" /><text x="92" y="78" font-size="8">Neuron</text>
-                            <!-- Output -->
-                            <circle cx="170" cy="75" r="12" fill="#a7f3d0" stroke="#10b981" /><text x="165" y="78" font-size="8">Out</text>
-                            <!-- Lines -->
-                            <line x1="40" y1="40" x2="88" y2="75" stroke="#94a3b8" stroke-width="1"/>
-                            <text x="50" y="50" font-size="8" fill="red">+2</text>
-                            <line x1="40" y1="110" x2="88" y2="75" stroke="#94a3b8" stroke-width="1"/>
-                            <text x="50" y="105" font-size="8" fill="red">+1</text>
-                            <line x1="112" y1="75" x2="158" y2="75" stroke="#94a3b8" stroke-width="1"/>
-                            <text x="130" y="70" font-size="8" fill="red">+3</text>
-                        </svg>
-                        <p class="text-[10px] text-slate-500 mt-2 text-center">Calcul: \( h = f(2x_1 + 1x_2 - 2) \)<br>\( y = f(3h + 1) \)</p>
-                    </div>
-                </div>
-            </section>
+                <table class="w-full text-xs text-center border mb-2">
+                    <thead class="bg-slate-200"><tr><th>Famille</th><th>Sal (k)</th><th>Enf</th><th>Norm Sal</th><th>Norm Enf</th><th>Cluster</th></tr></thead>
+                    <tbody>
+                        <tr><td>F1</td><td>70</td><td>5</td><td>0.6</td><td>1.0</td><td>C2</td></tr>
+                        <tr><td>F2</td><td>30</td><td>3</td><td>0.2</td><td>0.5</td><td>C3</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
-            <!-- EX 2: Clustering Familles -->
-            <section class="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden">
-                <div class="bg-blue-800 px-6 py-3 flex justify-between items-center text-white">
-                    <h3 class="font-bold"><i class="fa-solid fa-users mr-2"></i>Ex 2: Clustering Familles (7pts)</h3>
+            <!-- Ex 3 Bayes -->
+            <div class="bg-white p-6 rounded-xl shadow border-l-4 border-emerald-500">
+                <h3 class="font-bold text-lg text-emerald-800 mb-2">Ex 3 : Bayes Naïf (Application)</h3>
+                <div class="pedago-box">
+                    <div class="pedago-header">Calcul des probabilités a posteriori</div>
+                    <p class="text-sm font-mono mb-2">
+                        P(Oui) = 5/8, P(Non) = 3/8.<br>
+                        Patient X : (Toux=N, Fat=N, Tête=Doux, Fièvre=Oui).
+                    </p>
+                    <p class="text-sm font-mono">
+                        Score(Oui) = P(O) * P(N|O) * P(N|O) * P(D|O) * P(O|O)<br>
+                        = 0.625 * 0.2 * 0.2 * 0.4 * 0.8 = <strong>0.008</strong>
+                    </p>
+                    <p class="text-sm font-mono mt-1">
+                        Score(Non) = 0.375 * 0.66 * 0.66 * 0.33 * 0 = <strong>0</strong>
+                    </p>
                 </div>
-                <div class="p-6">
-                    <div class="overflow-x-auto mb-4">
-                        <table class="w-full text-xs text-center border">
-                            <thead class="bg-slate-100">
-                                <tr><th class="p-1">Famille</th><th>F1</th><th>F2</th><th>F3</th><th>F4</th><th>F5</th><th>F6</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="font-bold">Salaire</td><td>70k</td><td>30k</td><td>80k</td><td>10k</td><td>50k</td><td>110k</td></tr>
-                                <tr><td class="font-bold">Enfants</td><td>5</td><td>3</td><td>1</td><td>1</td><td>3</td><td>?</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6 text-xs text-slate-700">
-                        <div>
-                            <strong>Q2. Normalisation Min-Max :</strong>
-                            <p class="mb-1">Pourquoi ? Car l'échelle des salaires (10k-110k) écrase celle des enfants (1-5). La distance serait biaisée uniquement par le salaire.</p>
-                            <div class="font-mono bg-blue-50 p-2 rounded">
-                                \( x' = \frac{x - \min}{\max - \min} \)<br>
-                                Salaire: min=10k, max=110k (Plage 100k)<br>
-                                Enfants: min=1, max=5 (Plage 4)<br>
-                                Ex F1: Sal \(\frac{70-10}{100}=0.6\), Enf \(\frac{5-1}{4}=1\) -> [0.6, 1]
-                            </div>
-                        </div>
-                        <div>
-                            <strong>Q3. Itération K-means (k=1 ? Erreur énoncé k=3) :</strong>
-                            <p class="mb-1">Centres initiaux : C1[1,0] (Riche, sans enfant), C2[0.5,0.5] (Moyen), C3[0,0.5] (Pauvre, moyen enfants).</p>
-                            <p>On calcule la distance de chaque famille normalisée vers C1, C2, C3 et on affecte.</p>
-                            <p class="font-bold text-blue-600">-> Mise à jour des centres : Moyenne des points affectés.</p>
-                        </div>
-                    </div>
+                <div class="bg-green-50 p-2 border border-green-200 text-center font-bold text-sm">
+                    Conclusion : Le patient a le Covid (Classe Oui).
                 </div>
-            </section>
-
-            <!-- EX 3: Naive Bayes -->
-            <section class="bg-white rounded-xl shadow-lg border border-purple-100 overflow-hidden mb-12">
-                <div class="bg-purple-800 px-6 py-3 flex justify-between items-center text-white">
-                    <h3 class="font-bold"><i class="fa-solid fa-virus-covid mr-2"></i>Ex 3: Diagnostic Covid (6pts)</h3>
-                </div>
-                <div class="p-6">
-                    <div class="bg-purple-50 p-4 rounded text-xs">
-                        <h4 class="font-bold mb-2">Q4. Prédiction Patient X : {Toux=Non, Fatigue=Non, Tête=Doux, Fièvre=Qui}</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <strong>1. Proba Prior :</strong><br>
-                                P(Covid=Oui) = 5/8<br>
-                                P(Covid=Non) = 3/8
-                            </div>
-                            <div>
-                                <strong>2. Vraisemblance (P(X|C)) :</strong><br>
-                                - P(Toux=Non | Oui) = 1/5<br>
-                                - P(Fat=Non | Oui) = 1/5<br>
-                                - P(Tête=Doux | Oui) = 2/5<br>
-                                - P(Fièvre=Qui | Oui) = 4/5 (Attention 'Qui' dans tableau ?)<br>
-                                Produit_Oui = \( \frac{5}{8} \times \frac{1}{5} \times \frac{1}{5} \times \frac{2}{5} \times \frac{4}{5} \approx 0.008 \)
-                            </div>
-                        </div>
-                        <div class="mt-2 pt-2 border-t border-purple-200">
-                            <strong>Conclusion :</strong> On compare Produit_Oui et Produit_Non. La classe avec le score le plus élevé l'emporte.
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </div>
         </div>
 
     </main>
@@ -1029,715 +659,405 @@
     <footer class="bg-nuit text-slate-300 border-t-4 border-orange-500 mt-12">
         <div class="container mx-auto px-4 py-12">
             <div class="flex flex-col md:flex-row justify-between items-start gap-8">
-                
-                <!-- Profil Expert -->
                 <div class="flex items-start space-x-4 max-w-lg">
-                    <div class="bg-slate-800 p-4 rounded-full border-2 border-orange-500">
+                    <div class="bg-slate-800 p-4 rounded-full border-2 border-orange-500 hover:scale-105 transition duration-300">
                         <i class="fa-solid fa-user-tie text-4xl text-white"></i>
                     </div>
                     <div>
-                        <h4 class="text-white text-xl font-bold uppercase">Ahmed Haithem BERKANE</h4>
-                        <p class="text-orange-custom text-sm font-bold mb-3 tracking-wide">Consultant, Développeur Web & Solutions IA</p>
-                        <p class="text-sm text-slate-400 leading-relaxed mb-4">
-                            Expert technique et pédagogique passionné par l'innovation et l'intelligence artificielle. Développeur Freelance et Formateur avec plus de 700 heures d'enseignement en ligne. Spécialiste en développement Full Stack et Machine Learning.
+                        <h4 class="text-white text-xl font-bold uppercase tracking-widest mb-2">Ahmed Haithem BERKANE</h4>
+                        <p class="text-orange-custom text-sm font-bold mb-4 tracking-wide border-b border-slate-700 pb-2 inline-block">Consultant, Développeur Web & Solutions IA</p>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6 font-light">
+                            Ingénieur d'État et Consultant passionné par la convergence entre le Développement Web et l'Intelligence Artificielle.
+                            Fort d'une expertise technique solide et d'une pédagogie éprouvée (plus de 700 heures de formation dispensées), j'accompagne étudiants et professionnels dans la maîtrise des concepts complexes du Machine Learning.
+                            Développeur Full Stack Freelance, je transforme les théories abstraites en solutions concrètes et interactives.
                         </p>
-                        <div class="flex space-x-3">
-                            <a href="https://www.linkedin.com/in/haithem-berkane-602496108/" class="w-8 h-8 rounded bg-slate-700 hover:bg-orange-500 text-white flex items-center justify-center transition"><i class="fa-brands fa-linkedin-in"></i></a>
-                            <a href="mailto:haithem-berkane@outlook.fr" class="w-8 h-8 rounded bg-slate-700 hover:bg-orange-500 text-white flex items-center justify-center transition"><i class="fa-solid fa-envelope"></i></a>
+                        <div class="flex space-x-4">
+                            <a href="https://www.linkedin.com/in/haithem-berkane-602496108" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded bg-blue-700 hover:bg-blue-600 text-white transition text-sm font-bold">
+                                <i class="fa-brands fa-linkedin-in"></i> LinkedIn
+                            </a>
+                            <a href="mailto:haithem-berkane@outlook.fr" class="flex items-center gap-2 px-4 py-2 rounded bg-slate-700 hover:bg-orange-500 text-white transition text-sm font-bold">
+                                <i class="fa-solid fa-envelope"></i> Email
+                            </a>
                         </div>
                     </div>
                 </div>
-
-                <!-- Coordonnées -->
-                <div class="text-left md:text-right space-y-2">
-                    <h5 class="text-white font-bold uppercase mb-3 border-b border-slate-700 pb-2 inline-block">Contact</h5>
-                    <p class="text-sm hover:text-orange-custom transition"><i class="fa-solid fa-location-dot mr-2"></i> Algérie</p>
-                    <p class="text-sm hover:text-orange-custom transition"><a href="mailto:haithem-berkane@outlook.fr"><i class="fa-solid fa-at mr-2"></i>haithem-berkane@outlook.fr</a></p>
-                    <p class="text-sm hover:text-orange-custom transition"><i class="fa-solid fa-phone mr-2"></i>+213 661 33 83 33</p>
-                    <p class="text-xs text-slate-500 mt-4">&copy; 2026 - Archive Pédagogique H. Berkane.</p>
+                <div class="text-left md:text-right space-y-4">
+                    <h5 class="text-white font-bold uppercase mb-2 border-b border-slate-700 pb-2 inline-block">Contact & Localisation</h5>
+                    <p class="text-sm hover:text-orange-custom transition cursor-pointer"><i class="fa-solid fa-location-dot mr-2 text-orange-500"></i> Algérie</p>
+                    <p class="text-sm hover:text-orange-custom transition cursor-pointer"><i class="fa-solid fa-phone mr-2 text-orange-500"></i>+213 661 33 83 33</p>
+                    <p class="text-xs text-slate-500 mt-6">&copy; 2026 - Archive Pédagogique H. Berkane. <br>Tous droits réservés.</p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- SCRIPTS -->
+    <!-- LOGIQUE JAVASCRIPT -->
     <script>
-        // --- NAVIGATION ---
+        /* === GLOBALS (TOP LEVEL) === */
+        let km_points = [], km_centroids = [], km_k = 3, km_step = 0, km_interval = null;
+        let knnPoints = [], knnMouse = {x: -100, y: -100};
+        let hcaPoints = [], hcaClusters = [], hcaHistory = [];
+        let svm_points = [], svm_w = {x:0, y:0}, svm_b = 0, svm_animId = null;
+        let apr_transactions = [];
+        let bnState = {spam:null, money:null, urgent:null};
+        
+        const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+        const APR_ITEMS = ["🍎", "🍌", "🍇", "🍊", "🍉", "🥖", "🥐", "🧀", "🥚", "🧈", "🍗", "🥩", "🍔", "🍕", "🥤"];
+
+        /* === GESTIONNAIRE D'ONGLETS === */
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const tab = document.getElementById(`tab-${tabId}`);
+            if(tab) tab.classList.add('active');
+            
             const btn = document.getElementById(`btn-${tabId}`);
             if(btn) btn.classList.add('active');
             
-            if(tabId === 'exam') drawExamSvm3D();
+            if(tabId === 'exam-ghardaia') initGhardaiaCharts();
+            if(tabId === 'hca' && hcaPoints.length === 0) hca_init();
+            if(tabId === 'knn' && knnPoints.length === 0) knn_init();
+            if(tabId === 'apriori' && apr_transactions.length === 0) apr_generateDeepData();
             if(tabId === 'kmeans' && km_points.length === 0) km_generateRandomPoints();
             if(tabId === 'svm' && svm_points.length === 0) svm_reset();
-            if(tabId === 'knn') knn_init();
-            if(tabId === 'apriori' && apr_transactions.length === 0) apr_generateData();
+            if(tabId === 'exos') loadExos();
         }
 
-        /* === LOGIQUE KNN (NOUVEAU) === */
-        const knnCanvas = document.getElementById('knnCanvas');
-        const knnCtx = knnCanvas ? knnCanvas.getContext('2d') : null;
-        let knnPoints = [];
-        let knnMouse = {x: -100, y: -100};
-
-        function knn_init() { if(knnPoints.length === 0) knn_reset(); knn_draw(); }
-        function knn_reset() {
-            knnPoints = [];
-            for(let i=0; i<15; i++) knnPoints.push({x: Math.random()*250+50, y: Math.random()*250+50, type: 'A'});
-            for(let i=0; i<15; i++) knnPoints.push({x: Math.random()*250+300, y: Math.random()*250+100, type: 'B'});
-            knn_draw();
-        }
-        if(knnCanvas) {
-            knnCanvas.addEventListener('mousemove', e => {
-                const rect = knnCanvas.getBoundingClientRect();
-                knnMouse = { x: (e.clientX - rect.left) * (knnCanvas.width / rect.width), y: (e.clientY - rect.top) * (knnCanvas.height / rect.height) };
-                knn_draw();
-            });
-            knnCanvas.addEventListener('mousedown', e => {
-                const rect = knnCanvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left) * (knnCanvas.width / rect.width);
-                const y = (e.clientY - rect.top) * (knnCanvas.height / rect.height);
-                knnPoints.push({x, y, type: (x < 300) ? 'B' : 'A'});
-                knn_draw();
-            });
-        }
-        function knn_draw() {
-            if(!knnCtx) return;
-            knnCtx.clearRect(0, 0, knnCanvas.width, knnCanvas.height);
-            const k = parseInt(document.getElementById('knn-k-input').value);
-            knnPoints.forEach(p => {
-                knnCtx.beginPath(); knnCtx.arc(p.x, p.y, 6, 0, Math.PI*2);
-                knnCtx.fillStyle = p.type === 'A' ? '#ef4444' : '#3b82f6'; knnCtx.fill();
-            });
-            if(knnMouse.x > 0) {
-                let dists = knnPoints.map(p => ({ point: p, d: Math.hypot(p.x - knnMouse.x, p.y - knnMouse.y) }));
-                dists.sort((a, b) => a.d - b.d);
-                let neighbors = dists.slice(0, k);
-                let countA = 0;
-                neighbors.forEach(n => {
-                    knnCtx.beginPath(); knnCtx.moveTo(knnMouse.x, knnMouse.y); knnCtx.lineTo(n.point.x, n.point.y);
-                    knnCtx.strokeStyle = '#94a3b8'; knnCtx.setLineDash([5, 5]); knnCtx.stroke(); knnCtx.setLineDash([]);
-                    if(n.point.type === 'A') countA++;
-                });
-                knnCtx.beginPath(); knnCtx.arc(knnMouse.x, knnMouse.y, 10, 0, Math.PI*2);
-                knnCtx.fillStyle = countA > k/2 ? '#ef4444' : '#3b82f6'; knnCtx.fill(); knnCtx.stroke();
-            }
-        }
-
-        /* === LOGIQUE EXAMEN APRIORI === */
-        function runExamApriori() {
-            const log = document.getElementById('apriori-log');
-            log.innerHTML = "";
-            const steps = [
-                { title: "Étape 1 : C1", content: "P:3, F:3, O:1, J:4, L:3, Y:1" },
-                { title: "Étape 2 : L1 (MinSup 3)", content: "{P}:3, {F}:3, {J}:4, {L}:3" },
-                { title: "Étape 3 : C2", content: "{P,F}, {P,J}, {P,L}, {F,J}, {F,L}, {J,L}" },
-                { title: "Étape 4 : L2", content: "{P,J}:3 (Gardé), Autres rejetés (<3)" },
-                { title: "Étape 5 : Règles", content: "P->J (100%), J->P (75%)" }
+        /* === EXERCICES === */
+        function loadExos() {
+            const container = document.getElementById('exos-container');
+            if(container.innerHTML.trim() !== "") return;
+            
+            const exos = [
+                { 
+                    title: "KNN", 
+                    qs: [
+                        {q: "Si K=1 et qu'il y a du bruit (outliers), que se passe-t-il ?", r: "Modèle très instable (Overfitting)."},
+                        {q: "Calculer la distance Euclidienne entre (0,0) et (3,4).", r: "Racine(3^2 + 4^2) = 5."},
+                        {q: "Avantage principal du KNN ?", r: "Simple, pas d'entraînement explicite."},
+                        {q: "Inconvénient majeur ?", r: "Lent en prédiction (doit calculer toutes les distances)."},
+                        {q: "Pourquoi normaliser ?", r: "Pour que toutes les dimensions aient le même poids."}
+                    ] 
+                },
+                { 
+                    title: "K-Means", 
+                    qs: [
+                        {q: "Comment choisir le meilleur K ?", r: "Méthode du coude (Elbow) sur la courbe d'inertie."},
+                        {q: "L'algorithme converge-t-il toujours vers l'optimum global ?", r: "Non, seulement vers un optimum local."},
+                        {q: "Quelle est l'étape 1 ?", r: "Choisir K centres aléatoirement."},
+                        {q: "Quelle est l'étape 2 ?", r: "Affecter chaque point au centre le plus proche."},
+                        {q: "Formule de mise à jour ?", r: "Nouveau centre = Moyenne des points du cluster."}
+                    ] 
+                },
+                { 
+                    title: "Arbres", 
+                    qs: [
+                        {q: "Qu'est-ce que l'entropie ?", r: "Mesure du désordre/impureté d'un ensemble."},
+                        {q: "Formule de l'entropie ?", r: "- Somme(p_i * log2(p_i))."},
+                        {q: "Critère de choix de la racine ?", r: "Gain d'Information maximal."},
+                        {q: "Problème des arbres profonds ?", r: "Sur-apprentissage (Overfitting)."},
+                        {q: "Solution au sur-apprentissage ?", r: "Élagage (Pruning) ou Random Forest."}
+                    ] 
+                },
+                { 
+                    title: "HCA", 
+                    qs: [
+                        {q: "Approche de HCA ?", r: "Bottom-Up (Agglomératif) ou Top-Down."},
+                        {q: "Qu'est-ce que le Single Linkage ?", r: "Distance minimale entre points de deux clusters."},
+                        {q: "Avantage par rapport à K-Means ?", r: "Pas besoin de fixer K, visualisation hiérarchique."},
+                        {q: "Qu'est-ce qu'un Dendrogramme ?", r: "Arbre représentant les fusions successives."},
+                        {q: "Distance de Ward ?", r: "Minimise l'augmentation de la variance intra-classe."}
+                    ] 
+                }
             ];
-            let delay = 0;
-            steps.forEach(step => {
-                setTimeout(() => {
-                    log.innerHTML += `<div class="mb-4 border-b border-slate-200 pb-2"><h5 class="font-bold text-emerald-800">${step.title}</h5><div class="pl-2 mt-1">${step.content}</div></div>`;
-                    log.scrollTop = log.scrollHeight;
-                }, delay);
-                delay += 1200;
+            
+            let html = "";
+            exos.forEach(ex => {
+                html += `<div class="bg-white p-4 rounded-lg shadow border border-slate-200 mb-4">
+                    <h3 class="font-bold text-lg text-slate-800 mb-2 border-b pb-1">${ex.title}</h3>
+                    <ul class="space-y-2 text-sm text-slate-600">
+                        ${ex.qs.map((item, i) => `
+                            <li class="bg-slate-50 p-2 rounded border border-slate-100">
+                                <span class="font-bold text-slate-800">Q${i+1}:</span> ${item.q}
+                                <br><span class="text-xs text-green-700 italic">R: ${item.r}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>`;
             });
+            container.innerHTML = html;
         }
 
-        /* === LOGIQUE EXAMEN SVM VISUALISATION === */
-        function drawExamSvm3D() {
-            const canvas = document.getElementById('examSvmCanvas');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0,0,300,250);
-            const cx = 150, cy = 125;
-            ctx.strokeStyle = "#475569"; ctx.beginPath(); ctx.moveTo(cx, 20); ctx.lineTo(cx, 230); ctx.moveTo(20, cy); ctx.lineTo(280, cy); ctx.stroke();
-            ctx.fillStyle = "#ef4444"; ctx.beginPath(); ctx.arc(cx-40, cy+40, 6, 0, Math.PI*2); ctx.fill(); ctx.fillText("φ(x1)", cx-35, cy+55);
-            ctx.fillStyle = "#3b82f6"; ctx.beginPath(); ctx.arc(cx+40, cy-60, 6, 0, Math.PI*2); ctx.fill(); ctx.fillText("φ(x2)", cx+45, cy-50);
-            ctx.strokeStyle = "#fbbf24"; ctx.setLineDash([5,5]); ctx.beginPath(); ctx.moveTo(cx-60, cy+20); ctx.lineTo(cx+60, cy-40); ctx.stroke(); ctx.setLineDash([]);
-        }
-
-        /* === LOGIQUE K-MEANS === */
-        const km_canvas = document.getElementById('kmeansCanvas');
-        const km_ctx = km_canvas.getContext('2d');
-        let km_points = [], km_centroids = [], km_k = 3, km_step = 0;
-        let km_interval = null; // Variable pour gérer l'animation
-        const km_colors = ['#ef4444', '#3b82f6', '#22c55e'];
-        
-        function updateStepHighlight(idx) {
-            for(let i=0;i<4;i++) {
-                let el = document.getElementById('step-'+i);
-                if(el) { el.classList.remove('step-active'); if(i===idx) el.classList.add('step-active'); }
-            }
-        }
+        /* === K-MEANS === */
         function km_generateRandomPoints() {
-            km_stopAuto(); // Arrêter l'animation si elle tourne
-            km_points=[]; km_centroids=[]; km_step=0;
+            km_stopAuto(); km_points=[]; km_centroids=[]; km_step=0;
             for(let i=0; i<50; i++) km_points.push({x:Math.random()*600, y:Math.random()*400, c:-1});
-            km_draw(); updateStepHighlight(-1);
+            km_draw(); 
         }
         function km_initCentroids() {
-            km_stopAuto(); // Arrêter l'animation avant de réinitialiser
-            km_centroids=[];
-            for(let i=0; i<km_k; i++) km_centroids.push({x:Math.random()*600, y:Math.random()*400, color:km_colors[i]});
-            km_step=1; km_draw(); updateStepHighlight(0);
+            km_stopAuto(); km_centroids=[];
+            for(let i=0; i<km_k; i++) km_centroids.push({x:Math.random()*600, y:Math.random()*400, color:COLORS[i]});
+            km_step=1; km_draw(); 
         }
-        
         function km_nextStep() {
             if(!km_centroids.length) return;
-            
-            // Si on est déjà en convergence, on ne fait rien
-            if(document.getElementById('step-3').classList.contains('step-active')) {
-                km_stopAuto();
-                return;
-            }
-
-            if(km_step===1) {
-                // Etape 2: Affectation
+            if(km_step%2 !== 0) { 
                 km_points.forEach(p=>{
                     let min=Infinity, best=-1;
                     km_centroids.forEach((c,i)=>{ let d=Math.hypot(p.x-c.x, p.y-c.y); if(d<min){min=d; best=i;} });
                     p.c=best;
                 });
-                km_step=2; updateStepHighlight(1);
-            } else {
-                // Etape 3: Mise à jour (Barycentre) & Vérification Convergence
-                let maxShift = 0;
-                
-                km_centroids.forEach((c,i)=>{
+            } else { 
+                 km_centroids.forEach((c,i)=>{
                     let pts=km_points.filter(p=>p.c===i);
-                    if(pts.length) { 
-                        let oldX = c.x;
-                        let oldY = c.y;
-                        c.x=pts.reduce((s,p)=>s+p.x,0)/pts.length; 
-                        c.y=pts.reduce((s,p)=>s+p.y,0)/pts.length; 
-                        let shift = Math.hypot(c.x - oldX, c.y - oldY);
-                        if(shift > maxShift) maxShift = shift;
-                    }
+                    if(pts.length) { c.x=pts.reduce((s,p)=>s+p.x,0)/pts.length; c.y=pts.reduce((s,p)=>s+p.y,0)/pts.length; }
                 });
-
-                // Si le mouvement max est négligeable (< 0.5px), on considère que ça a convergé
-                if(maxShift < 0.5) {
-                    updateStepHighlight(3); // Highlight Convergence
-                    km_stopAuto(); // Stop auto run
-                } else {
-                    km_step=1; 
-                    updateStepHighlight(2); // Highlight Mise à jour
-                }
             }
+            km_step++;
             km_draw();
         }
-        
-        function km_runAuto() { 
-            if(km_interval) clearInterval(km_interval);
-            km_interval = setInterval(km_nextStep, 500); 
-        }
-        
-        function km_stopAuto() {
-            if(km_interval) {
-                clearInterval(km_interval);
-                km_interval = null;
-            }
-        }
-        
-        function km_clearCanvas() {
-            km_stopAuto();
-            km_points = [];
-            km_centroids = [];
-            km_step = 0;
-            km_draw();
-            updateStepHighlight(-1);
-        }
-
         function km_draw() {
-            if(!km_ctx) return;
-            km_ctx.clearRect(0,0,600,400);
-            km_points.forEach(p=>{ km_ctx.beginPath(); km_ctx.arc(p.x,p.y,5,0,6.28); km_ctx.fillStyle=p.c==-1?'#999':km_centroids[p.c].color; km_ctx.fill(); });
-            km_centroids.forEach(c=>{ km_ctx.beginPath(); km_ctx.arc(c.x,c.y,10,0,6.28); km_ctx.fillStyle=c.color; km_ctx.fill(); km_ctx.strokeStyle='#000'; km_ctx.stroke(); });
+            const ctx = document.getElementById('kmeansCanvas').getContext('2d');
+            ctx.clearRect(0,0,600,400);
+            km_points.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,5,0,6.28); ctx.fillStyle=p.c==-1?'#999':km_centroids[p.c].color; ctx.fill(); });
+            km_centroids.forEach(c=>{ ctx.beginPath(); ctx.arc(c.x,c.y,12,0,6.28); ctx.fillStyle=c.color; ctx.fill(); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.stroke(); });
         }
-
-        /* === LOGIQUE BAYES NAIF === */
-        const vocab = { 'argent': {s:0.9, h:0.1}, 'gagnez': {s:0.95, h:0.05}, 'urgent': {s:0.8, h:0.2}, 'gratuit': {s:0.9, h:0.1} };
-        function analyzeSpam() {
-            let w = document.getElementById('spamInput').value.toLowerCase().split(/\W+/), ps=0.5, ph=0.5, txt="";
-            let details = "Calcul : P(S) ";
-            w.forEach(x => { 
-                if(vocab[x]) { 
-                    ps*=vocab[x].s; ph*=vocab[x].h; 
-                    let col = vocab[x].s > 0.5 ? "text-red-600 bg-red-50" : "text-emerald-600 bg-emerald-50";
-                    txt+=`<div class="${col} px-1 rounded mb-1 flex justify-between"><span>"${x}"</span><span>P(w|S)=${vocab[x].s}</span></div>`; 
-                    details += `× ${vocab[x].s} `;
-                } 
-            });
-            let f = ps/(ps+ph);
-            document.getElementById('spamBar').style.width = (f*100)+"%"; document.getElementById('hamBar').style.width = ((1-f)*100)+"%";
-            document.getElementById('probLabel').innerText = `Ham: ${(100-f*100).toFixed(0)}% - Spam: ${(f*100).toFixed(0)}%`;
-            document.getElementById('naive-math-trace').innerHTML = `<strong>${details}</strong><br>Score final Spam : ${ps.toExponential(2)}`;
-            document.getElementById('wordAnalysis').innerHTML = txt || "Aucun mot connu.";
+        function km_runAuto() {
+            if(km_interval) km_stopAuto();
+            else { km_interval = setInterval(km_nextStep, 600); document.getElementById('btn-km-auto').innerHTML = "Pause"; }
         }
+        function km_stopAuto() { clearInterval(km_interval); km_interval=null; document.getElementById('btn-km-auto').innerHTML = 'Auto'; }
 
-        /* === LOGIQUE RESEAU BAYESIEN === */
-        let bnState = {spam:null, money:null, urgent:null, link:null};
-        function getBnProb(v, val, cond) {
-            if (v === 'spam') return 0.4;
-            if (v === 'money') return cond.spam ? 0.8 : 0.1;
-            if (v === 'urgent') return cond.spam ? 0.7 : 0.2;
-            if (v === 'link') {
-                const s = cond.spam; const u = cond.urgent;
-                if(s && u) return 0.90;
-                if(s && !u) return 0.60;
-                if(!s && u) return 0.10;
-                return 0.01;
-            }
-            return 0;
-        }
-
-        function inferBnNetwork() {
-            let totalW = 0, margSpam = 0, margM = 0, margU = 0, margL = 0;
-            let bools = [true, false];
-            for (let s of bools) {
-                for (let m of bools) {
-                    for (let u of bools) {
-                        for (let l of bools) {
-                            if (bnState.money !== null && bnState.money !== m) continue;
-                            if (bnState.urgent !== null && bnState.urgent !== u) continue;
-                            if (bnState.link !== null && bnState.link !== l) continue;
-
-                            let ps = s ? 0.4 : 0.6;
-                            let pm = m ? (s?0.8:0.1) : (1-(s?0.8:0.1));
-                            let pu = u ? (s?0.7:0.2) : (1-(s?0.7:0.2));
-                            let pl_val = getBnProb('link', true, {spam:s, urgent:u});
-                            let pl = l ? pl_val : (1-pl_val);
-
-                            let joint = ps * pm * pu * pl;
-                            totalW += joint;
-                            if(s) margSpam += joint;
-                            if(m) margM += joint;
-                            if(u) margU += joint;
-                            if(l) margL += joint;
-                        }
-                    }
-                }
-            }
-            let finalS = totalW > 0 ? margSpam/totalW : 0;
-            let finalM = totalW > 0 ? margM/totalW : 0;
-            let finalU = totalW > 0 ? margU/totalW : 0;
-            let finalL = totalW > 0 ? margL/totalW : 0;
-
-            updateBnNode('spam', finalS, bnState.spam !== null);
-            updateBnNode('money', finalM, bnState.money !== null);
-            updateBnNode('urgent', finalU, bnState.urgent !== null);
-            updateBnNode('link', finalL, bnState.link !== null);
-
-            document.getElementById('bn-trace').innerHTML = `
-                <div class="mb-2"><strong>Probabilité Spam :</strong></div>
-                <div class="text-xl font-bold text-red-600">${(finalS*100).toFixed(1)}%</div>
-                <div class="text-xs text-slate-500 mt-2">Calculé par inférence exacte.</div>
-            `;
-        }
-
-        function updateBnNode(id, prob, isObserved) {
-            const bar = document.getElementById(`bar-${id}`);
-            const txt = document.getElementById(`txt-${id}`);
-            const node = document.getElementById(`node-${id}`);
-            bar.style.width = `${prob*100}%`;
-            txt.innerText = `${(prob*100).toFixed(0)}%`;
-            if(id !== 'spam') { 
-               if(isObserved) {
-                   node.classList.add('border-orange-500');
-                   node.classList.remove('border-slate-300');
-                   bar.classList.remove('bg-blue-500'); bar.classList.add('bg-orange-500');
-               } else {
-                   node.classList.remove('border-orange-500', 'border-slate-400');
-                   node.classList.add('border-slate-300');
-                   bar.classList.add('bg-blue-500'); bar.classList.remove('bg-orange-500');
-               }
-            }
-        }
-        function toggleBnNode(id) { 
-            if(bnState[id] === null) bnState[id] = true;
-            else if(bnState[id] === true) bnState[id] = false;
-            else bnState[id] = null;
-            inferBnNetwork(); 
-        }
-        function resetBnNetwork() { bnState={spam:null, money:null, urgent:null, link:null}; inferBnNetwork(); }
-
-        /* === LOGIQUE SVM === */
-        const svm_canvas = document.getElementById('svmCanvas');
-        const svm_ctx = svm_canvas.getContext('2d');
-        let svm_mode = '2d', svm_points = [], svm_w = {x:0, y:0}, svm_b = 0, svm_currentClass = 1, svm_animId = null, svm_3d_angle = 0;
-
-        function setSvmMode(m) {
-            svm_mode = m;
-            document.getElementById('svm-ctrl-2d').style.display = m==='2d'?'block':'none';
-            document.getElementById('svm-steps-container').style.display = m==='2d'?'block':'none';
-            document.getElementById('svm-math-log').style.display = m==='2d'?'block':'none';
-            document.getElementById('svm-ctrl-3d').style.display = m==='3d'?'block':'none';
-            document.getElementById('btn-svm-2d').className = m==='2d' ? "bg-teal-600 text-white px-4 py-2 rounded-lg shadow font-bold hover:bg-teal-700 transition" : "bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-lg shadow font-bold hover:bg-slate-50 transition";
-            document.getElementById('btn-svm-3d').className = m==='3d' ? "bg-teal-600 text-white px-4 py-2 rounded-lg shadow font-bold hover:bg-teal-700 transition" : "bg-white text-slate-600 border border-slate-300 px-4 py-2 rounded-lg shadow font-bold hover:bg-slate-50 transition";
-            svm_stopAuto();
-            if(m==='2d') svm_draw(); else svm_animate3d();
-        }
-
-        function updateSvmStepHighlight(idx) {
-            for(let i=0; i<4; i++) {
-                const el = document.getElementById(`svm-step-${i}`);
-                if(el) {
-                    el.classList.remove('step-active');
-                    if(i===idx) el.classList.add('step-active');
-                }
-            }
-        }
-
-        function svmLog(msg) {
-            const el = document.getElementById('svm-math-log');
-            const div = document.createElement('div');
-            div.className = "border-b border-slate-700 pb-1 mb-1 font-mono text-[9px]";
-            div.innerHTML = "> " + msg;
-            el.appendChild(div);
-            el.scrollTop = el.scrollHeight;
-        }
-
-        function svm_reset() { 
-            svm_points=[]; svm_w={x:Math.random()-0.5, y:Math.random()-0.5}; svm_b=0; 
-            svm_stopAuto(); 
-            svm_draw(); 
-            updateSvmStepHighlight(0); // Init
-            document.getElementById('svm-math-log').innerHTML = "<div class='text-slate-500'>// Reset complet</div>";
-        }
-        
-        function svm_generateRandom() {
-            svm_points = [];
-            // Generate two clouds
-            for(let i=0; i<20; i++) {
-                svm_points.push({x: -1.5 + Math.random(), y: -1.5 + Math.random(), label: -1}); // Red bottom left
-                svm_points.push({x: 1.5 + Math.random(), y: 1.5 + Math.random(), label: 1}); // Blue top right
-            }
-            svm_w={x:Math.random()-0.5, y:Math.random()-0.5}; svm_b=0;
-            svm_draw();
-            updateSvmStepHighlight(0);
-            svmLog("Données aléatoires générées.");
-        }
-
-        svm_canvas.addEventListener('mousedown', (e) => {
-            if(svm_mode !== '2d') return;
-            const r = svm_canvas.getBoundingClientRect();
-            svm_points.push({x:((e.clientX-r.left)*(600/r.width)-300)/100, y:-((e.clientY-r.top)*(400/r.height)-200)/100, label:svm_currentClass});
-            svm_draw();
-        });
-
-        function svm_trainStep() {
-            if(svm_points.length===0) return;
-            
-            // Simulation cycle d'étapes
-            updateSvmStepHighlight(2); // Calcul Erreur
-            
-            let misclassified = 0;
-            let logUpdate = false;
-
-            svm_points.forEach(p => {
-                // Check margin condition: label * (w.x + b) >= 1
-                if(p.label*(svm_w.x*p.x + svm_w.y*p.y + svm_b) < 1) {
-                    misclassified++;
-                    
-                    // Step 4: Update (Gradient Descent)
-                    const lr = 0.01;
-                    const oldWx = svm_w.x;
-                    const oldWy = svm_w.y;
-                    
-                    svm_w.x -= lr * (0.01*svm_w.x - p.label*p.x);
-                    svm_w.y -= lr * (0.01*svm_w.y - p.label*p.y);
-                    svm_b -= lr * (-p.label);
-                    
-                    if(!logUpdate) { 
-                        svmLog(`Erreur pt(${p.x.toFixed(1)},${p.y.toFixed(1)})<br>w_new = ${oldWx.toFixed(2)} - 0.01*(-${p.label}*${p.x.toFixed(1)}) = <span class="text-yellow-400">${svm_w.x.toFixed(2)}</span>`);
-                        logUpdate = true;
-                    }
-                } else {
-                    svm_w.x -= 0.01*0.01*svm_w.x; svm_w.y -= 0.01*0.01*svm_w.y;
-                }
-            });
-            
-            if(misclassified > 0) {
-                setTimeout(() => {
-                    updateSvmStepHighlight(3); // Optimisation
-                    svm_draw();
-                }, 100);
-            } else {
-                updateSvmStepHighlight(1); // Back to predict/stable
-                if(Math.random()>0.9) svmLog("<span class='text-blue-400'>Stable (Marge OK)</span>");
-                svm_draw();
-            }
-        }
-
-        function svm_trainAuto() { 
-            if(svm_animId){svm_stopAuto(); return;} 
-            const btn = document.getElementById('btn-svm-auto');
-            btn.innerHTML = '<i class="fa-solid fa-pause mr-2"></i> Pause';
-            
-            function l(){
-                svm_trainStep(); 
-                svm_animId=setTimeout(l, 400); // Ralenti pour pédagogie
-            } 
-            l(); 
-        }
-        
-        function svm_stopAuto() { 
-            if(svm_animId) clearTimeout(svm_animId); 
-            svm_animId=null; 
-            const btn = document.getElementById('btn-svm-auto');
-            if(btn) btn.innerHTML = '<i class="fa-solid fa-rocket mr-2"></i> Entraînement Auto';
-        }
-
-        function svm_draw() {
-            if(svm_mode!=='2d') return;
-            svm_ctx.fillStyle="#fff"; svm_ctx.fillRect(0,0,600,400);
-            
-            // Update Formula display
-            const eqDiv = document.getElementById('svm-eq-display');
-            const w1 = svm_w.x.toFixed(2);
-            const w2 = svm_w.y.toFixed(2);
-            const b = svm_b.toFixed(2);
-            if(eqDiv) {
-                eqDiv.innerHTML = `\\( f(x) = ${w1}x_1 + ${w2}x_2 + ${b} \\) <br> <span class='text-xs text-gray-400'>Frontière (f=0)</span>`;
-                if(window.MathJax) MathJax.typesetPromise([eqDiv]);
-            }
-
-            function line(off, col, w, dash) {
-                svm_ctx.beginPath(); svm_ctx.strokeStyle=col; svm_ctx.lineWidth=w; if(dash)svm_ctx.setLineDash([5,5]); else svm_ctx.setLineDash([]);
-                let y1=(-svm_w.x*-4-svm_b+off)/(svm_w.y+0.0001), y2=(-svm_w.x*4-svm_b+off)/(svm_w.y+0.0001);
-                svm_ctx.moveTo(300+-400, 200-y1*100); svm_ctx.lineTo(300+400, 200-y2*100); svm_ctx.stroke();
-            }
-            line(0, "#0d9488", 3); line(1, "#94a3b8", 1, true); line(-1, "#94a3b8", 1, true);
-            svm_points.forEach(p=>{ 
-                let px=300+p.x*100, py=200-p.y*100;
-                svm_ctx.beginPath(); svm_ctx.arc(px,py,6,0,6.28); svm_ctx.fillStyle=p.label===1?'#3b82f6':'#ef4444'; svm_ctx.fill();
-                if(p.label*(svm_w.x*p.x+svm_w.y*p.y+svm_b)<1.05) { svm_ctx.strokeStyle="#fbbf24"; svm_ctx.lineWidth=2; svm_ctx.stroke(); }
-            });
-        }
-
-        function svm_animate3d() {
-            if(svm_mode!=='3d') return;
-            svm_ctx.fillStyle="#f8fafc"; svm_ctx.fillRect(0,0,600,400);
-            const eq = document.getElementById('svm-eq-display');
-            if(eq) eq.innerText = "Projection: z = x² + y²";
-            
-            svm_3d_angle+=0.01;
-            let pts=[]; 
-            for(let i=0;i<40;i++) pts.push({t:i/40*6.28, r:0.5+Math.random()*0.3, l:-1});
-            for(let i=0;i<40;i++) pts.push({t:i/40*6.28, r:1.5+Math.random()*0.3, l:1});
-            let lift=(Math.sin(svm_3d_angle*0.5)+1)/2;
-            let ca=Math.cos(svm_3d_angle), sa=Math.sin(svm_3d_angle);
-            
-            pts.forEach(p=>{
-                let x=p.r*Math.cos(p.t), y=p.r*Math.sin(p.t), z=(x*x+y*y)*lift*1.5;
-                let rx=x*ca - z*sa, rz=x*sa + z*ca;
-                let sc=400/(400+rz+5);
-                let sx=300+rx*sc*100, sy=200+(y*0.5-z*0.8)*sc*100;
-                svm_ctx.beginPath(); svm_ctx.arc(sx,sy,Math.max(1,3*sc+z*2),0,6.28);
-                svm_ctx.fillStyle=p.l===1?'#3b82f6':'#ef4444'; svm_ctx.fill();
-            });
-            if(lift>0.5) {
-                svm_ctx.strokeStyle="rgba(13,148,136,0.5)"; svm_ctx.beginPath(); svm_ctx.moveTo(200, 200+(1.2*lift*-0.8)*100); svm_ctx.lineTo(400, 200+(1.2*lift*-0.8)*100); svm_ctx.stroke();
-            }
-            requestAnimationFrame(svm_animate3d);
-        }
-
-        /* === APRIORI LOGIQUE SIMULATEUR === */
-        let apr_transactions = [];
-        // Liste étendue de 25 produits
-        const apr_items = [
-            "🍎", "🍌", "🍇", "🍊", "🍉", 
-            "🥖", "🥐", "🍞", "🥯", "🥪",
-            "🥛", "🧀", "🥚", "🧈", "🍦",
-            "🍗", "🥩", "🍔", "🍕", "🍟",
-            "🍪", "🍩", "🍫", "☕", "🥤"
-        ];
-
-        function apr_generateData() {
+        /* === APRIORI === */
+        function apr_generateDeepData() {
             apr_transactions = [];
             const el = document.getElementById('apr-dataset-view');
-            el.innerHTML = "";
-            
-            // Génération de 30 transactions
+            let html = "";
             for(let i=1; i<=30; i++) {
                 let t = [];
-                // Probabilité ajustée à 0.8 (20% de chance d'avoir un item) pour éviter des paniers trop remplis
-                apr_items.forEach(item => { if(Math.random() > 0.85) t.push(item); });
-                
-                // S'assurer que le panier n'est pas vide
-                if(t.length === 0) {
-                    // Ajout de 1 à 3 items aléatoires
-                    const nbItems = Math.floor(Math.random() * 3) + 1;
-                    for(let k=0; k<nbItems; k++) {
-                        const randomItem = apr_items[Math.floor(Math.random()*apr_items.length)];
-                        if(!t.includes(randomItem)) t.push(randomItem);
-                    }
-                }
-                
+                if(Math.random()<0.4) t.push("🍎", "🍌", "🍇", "🍊"); 
+                else if(Math.random()<0.7) t.push("🍔", "🍟", "🥤");
+                for(let k=0; k<2; k++) t.push(APR_ITEMS[Math.floor(Math.random()*APR_ITEMS.length)]);
+                t = [...new Set(t)].sort();
                 apr_transactions.push(t);
-                el.innerHTML += `<div class="text-xs border-b border-slate-100 py-1 flex"><span class="font-bold w-8 text-slate-400">T${i}:</span> <span class="tracking-widest">${t.join(' ')}</span></div>`;
+                html += `<div>T${i}: ${t.join(' ')}</div>`;
             }
-            document.getElementById('apr-results').innerHTML = "<div class='text-center text-slate-400 mt-10'>30 Transactions générées avec 25 produits.<br>Cliquez sur Exécuter.</div>";
+            if(el) el.innerHTML = html;
+        }
+
+        function countSup(itemset) {
+            let count = 0;
+            apr_transactions.forEach(t => { if(itemset.every(val => t.includes(val))) count++; });
+            return count;
         }
 
         function apr_run() {
-            const minSupPct = parseInt(document.getElementById('apr-minsup').value);
-            const minConfPct = parseInt(document.getElementById('apr-minconf').value);
-            const N = apr_transactions.length;
-            const minSupCount = Math.ceil((minSupPct / 100) * N);
+            const minSup = Math.ceil(apr_transactions.length * (parseInt(document.getElementById('apr-minsup').value)/100));
+            const minConf = parseInt(document.getElementById('apr-minconf').value);
+            let html = "";
             
-            const resDiv = document.getElementById('apr-results');
-            resDiv.innerHTML = "";
-
-            function countSup(itemset) {
-                let count = 0;
-                apr_transactions.forEach(t => {
-                    if(itemset.every(val => t.includes(val))) count++;
-                });
-                return count;
-            }
-
-            let C1 = {};
-            apr_items.forEach(item => C1[item] = countSup([item]));
+            // Generate combos up to 4
+            let counts = {};
+            apr_transactions.forEach(t => {
+                for (let i = 1; i < (1 << t.length); i++) {
+                    let s = []; for (let j = 0; j < t.length; j++) if ((i & (1 << j)) > 0) s.push(t[j]);
+                    if(s.length > 0 && s.length <= 4) counts[s.sort().join(',')] = (counts[s.sort().join(',')]||0)+1;
+                }
+            });
             
-            // --- GRAPHE BÂTONNET (Conservé et adapté pour plus d'items) ---
-            let chartHtml = `<div class="bg-white border border-slate-200 rounded p-3 mb-4 shadow-sm">
-                <h5 class="font-bold text-xs text-slate-500 uppercase mb-3 flex justify-between">
-                    <span><i class="fa-solid fa-chart-bar mr-2"></i>Fréquences (Top items)</span>
-                    <span class="text-[10px] normal-case bg-slate-100 px-2 rounded">MinSup: ${minSupCount} occurrences</span>
-                </h5>
-                <div class="space-y-1 max-h-40 overflow-y-auto pr-2 custom-scrollbar">`;
-            
-            // On trie pour afficher les plus fréquents en premier
-            const sortedItems = Object.entries(C1).sort((a,b) => b[1] - a[1]);
-
-            for (const [item, count] of sortedItems) {
-                if(count === 0) continue; // On masque les items jamais achetés
-                const percentage = (count / N) * 100;
-                const isFrequent = count >= minSupCount;
-                const barColor = isFrequent ? 'bg-purple-600' : 'bg-slate-300';
-                const opacity = isFrequent ? 'opacity-100' : 'opacity-60';
-                const fontWeight = isFrequent ? 'font-bold text-purple-900' : 'text-slate-500';
+            Object.entries(counts).forEach(([k,v]) => {
+                let items = k.split(',');
+                let kept = v >= minSup;
+                let ruleInfo = "";
                 
-                chartHtml += `
-                    <div class="flex items-center text-[10px] ${opacity}">
-                        <div class="w-6 text-base text-center">${item}</div>
-                        <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                            <div class="${barColor} h-full" style="width: ${percentage}%"></div>
-                        </div>
-                        <div class="w-8 text-right font-mono ${fontWeight}">${count}</div>
-                    </div>
-                `;
-            }
-            chartHtml += `</div></div>`;
-            // --- FIN GRAPHE ---
-
-            let html = chartHtml + `<div class="bg-slate-50 p-3 rounded border mb-2"><h5 class="font-bold text-purple-700 text-sm">Étape 1 : Itemsets fréquents (L1)</h5><div class="grid grid-cols-3 gap-2 mt-2">`;
-            
-            let L1 = [];
-            for (const [item, count] of sortedItems) {
-                let keep = count >= minSupCount;
-                if(keep) {
-                    L1.push(item);
-                    html += `<div class="border rounded p-1 text-[10px] flex justify-between bg-green-100 border-green-300 text-green-800 font-bold"><span>${item}</span> <span>${count}</span></div>`;
+                // Calcul Règles pour items gardés et taille > 1
+                if(kept && items.length > 1) {
+                     let A = items.slice(0, items.length-1); 
+                     let B = items.slice(items.length-1);
+                     let supA = counts[A.join(',')] || 0;
+                     let supB = counts[B.join(',')] || 0;
+                     let conf = (v/supA)*100;
+                     let lift = (conf/100) / (supB/apr_transactions.length);
+                     
+                     if(conf >= minConf) {
+                        ruleInfo = `<br><span class="text-indigo-600 font-bold ml-2">➡ Règle: ${A}->${B} (Conf:${conf.toFixed(0)}%, Lift:${lift.toFixed(2)})</span>`;
+                     }
                 }
-            }
-            html += `</div></div>`;
-            
-            if(L1.length > 1) {
-                // Recherche des paires
-                let L2 = []; 
-                for(let i=0; i<L1.length; i++) {
-                    for(let j=i+1; j<L1.length; j++) {
-                        let pair = [L1[i], L1[j]];
-                        let count = countSup(pair);
-                        let keep = count >= minSupCount;
-                        if(keep) L2.push({items: pair, sup: count});
-                    }
-                }
-
-                if(L2.length > 0) {
-                    html += `<div class="bg-slate-50 p-3 rounded border mb-2"><h5 class="font-bold text-purple-700 text-sm">Étape 2 : Paires Fréquentes (L2)</h5><div class="grid grid-cols-2 gap-2 mt-2">`;
-                    L2.forEach(pairObj => {
-                         html += `<div class="border rounded p-1 text-[10px] flex justify-between bg-blue-100 border-blue-300 text-blue-800"><span>${pairObj.items.join('+')}</span> <span>Sup: ${pairObj.sup}</span></div>`;
-                    });
-                    html += `</div></div>`;
-
-                    // --- PARTIE RÈGLES D'ASSOCIATION DÉTAILLÉE ---
-                    html += `<div class="bg-white p-3 rounded border border-purple-200 shadow-sm border-t-4 border-t-purple-500">
-                        <h5 class="font-bold text-purple-900 text-sm mb-3 flex items-center">
-                            <i class="fa-solid fa-list-check mr-2"></i>Règles d'Association
-                            <span class="ml-auto text-[10px] font-normal bg-purple-100 px-2 py-1 rounded text-purple-700">MinConf: ${minConfPct}%</span>
-                        </h5>
-                        <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">`;
-                    
-                    let rulesFound = 0;
-                    L2.forEach(set => {
-                        let [A, B] = set.items;
-                        let supAB = set.sup;
-                        
-                        // Règle A -> B
-                        let supA = C1[A];
-                        let confAB = (supAB / supA) * 100;
-                        if(confAB >= minConfPct) {
-                            rulesFound++;
-                            html += `
-                            <div class="text-xs p-2 border border-slate-100 rounded bg-slate-50 hover:bg-white hover:shadow transition">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-bold text-slate-700 text-sm">${A} <i class="fa-solid fa-arrow-right text-slate-400 mx-1"></i> ${B}</span>
-                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold">${confAB.toFixed(1)}%</span>
-                                </div>
-                                <div class="text-[10px] text-slate-500 font-mono">
-                                    Conf = Sup(${A}+${B}) / Sup(${A}) = ${supAB} / ${supA}
-                                </div>
-                            </div>`;
-                        }
-
-                        // Règle B -> A
-                        let supB = C1[B];
-                        let confBA = (supAB / supB) * 100;
-                        if(confBA >= minConfPct) {
-                            rulesFound++;
-                            html += `
-                            <div class="text-xs p-2 border border-slate-100 rounded bg-slate-50 hover:bg-white hover:shadow transition">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-bold text-slate-700 text-sm">${B} <i class="fa-solid fa-arrow-right text-slate-400 mx-1"></i> ${A}</span>
-                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold">${confBA.toFixed(1)}%</span>
-                                </div>
-                                <div class="text-[10px] text-slate-500 font-mono">
-                                    Conf = Sup(${A}+${B}) / Sup(${B}) = ${supAB} / ${supB}
-                                </div>
-                            </div>`;
-                        }
-                    });
-                    
-                    if(rulesFound === 0) {
-                        html += `<div class="text-xs text-slate-400 italic text-center py-2">Aucune règle ne dépasse ${minConfPct}% de confiance. Essayez de baisser le seuil.</div>`;
-                    }
-                    html += `</div></div>`;
-                    // --- FIN PARTIE RÈGLES ---
-
-                } else {
-                    html += `<div class="text-xs text-slate-500 italic p-2 mt-2 bg-yellow-50 border border-yellow-100 rounded">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Aucune paire fréquente trouvée (L2 vide).
-                        <br>Conseil : Baissez le Min Support (%) pour voir plus de combinaisons.
-                    </div>`;
-                }
-            } else {
-                html += `<div class="text-xs text-slate-500 italic p-2 mt-2 bg-red-50 border border-red-100 rounded">
-                    Pas assez d'items fréquents pour former des paires.
+                
+                html += `<div class="${kept?'bg-green-50 border-green-200':'bg-red-50 border-red-100 opacity-60'} text-xs border-b p-1 mb-1 rounded">
+                    Itemset: {${items.join(' ')}} (Sup:${v}) 
+                    <span class="${kept?'text-green-700':'text-red-700'} font-bold text-[10px] uppercase ml-2">${kept?'RETENU':'ÉLAGUÉ'}</span>
+                    ${ruleInfo}
                 </div>`;
-            }
-            resDiv.innerHTML = html;
+            });
+            document.getElementById('apr-results').innerHTML = html || "Générez d'abord les données.";
         }
 
-        window.onload = function() {
-            // Init
+        /* === SVM === */
+        function svm_reset() { svm_stopAuto(); svm_points=[]; svm_w={x:0,y:0}; svm_b=0; svm_draw(); }
+        function svm_generateRandom() {
+            svm_points = [];
+            for(let i=0; i<20; i++) {
+                svm_points.push({x: Math.random()*4-2, y: Math.random()*4-2, l: Math.random()>0.5?1:-1});
+            }
+            svm_w={x:Math.random()-0.5, y:Math.random()-0.5}; svm_b=0; 
+            svm_draw();
+        }
+        function svm_trainStep() {
+            if(svm_points.length === 0) return;
+            svm_points.forEach(p => {
+                if(p.l*(svm_w.x*p.x + svm_w.y*p.y + svm_b) < 1) {
+                    svm_w.x += 0.01 * p.l * p.x;
+                    svm_w.y += 0.01 * p.l * p.y;
+                    svm_b += 0.01 * p.l;
+                }
+            });
+            svm_draw();
+            const log = document.getElementById('svm-math-log');
+            if(log) {
+                log.innerHTML += `<div>Update: w=(${svm_w.x.toFixed(2)}, ${svm_w.y.toFixed(2)}) b=${svm_b.toFixed(2)}</div>`;
+                log.scrollTop = log.scrollHeight;
+            }
+            document.getElementById('svm-eq-display').innerHTML = `Hyperplan: ${svm_w.x.toFixed(2)}x + ${svm_w.y.toFixed(2)}y + ${svm_b.toFixed(2)} = 0`;
+        }
+        function svm_draw() {
+            const ctx = document.getElementById('svmCanvas').getContext('2d');
+            ctx.clearRect(0,0,600,400);
+            ctx.fillStyle="#fff"; ctx.fillRect(0,0,600,400);
+            // Draw Line
+            ctx.beginPath(); ctx.strokeStyle="#0d9488"; ctx.lineWidth=3;
+            let x1 = -4, y1 = (-svm_b - svm_w.x*x1)/(svm_w.y+0.0001);
+            let x2 = 4, y2 = (-svm_b - svm_w.x*x2)/(svm_w.y+0.0001);
+            // Transform coords to canvas
+            ctx.moveTo(300 + x1*50, 200 - y1*50); ctx.lineTo(300 + x2*50, 200 - y2*50); ctx.stroke();
+            
+            svm_points.forEach(p=>{ 
+                let px=300+p.x*50, py=200-p.y*50;
+                ctx.beginPath(); ctx.arc(px,py,6,0,6.28); ctx.fillStyle=p.l===1?'#3b82f6':'#ef4444'; ctx.fill();
+            });
+        }
+        function svm_trainAuto() { if(svm_animId) svm_stopAuto(); else { svm_animId = setInterval(svm_trainStep, 50); document.getElementById('btn-svm-auto').innerHTML = "Pause"; } }
+        function svm_stopAuto() { clearInterval(svm_animId); svm_animId=null; document.getElementById('btn-svm-auto').innerHTML = 'Auto'; }
+
+        /* === KNN === */
+        function knn_init() { if(knnPoints.length === 0) knn_reset(); knn_draw(); }
+        function knn_reset() {
+            knnPoints = [];
+            for(let i=0; i<15; i++) knnPoints.push({x: Math.random()*550+20, y: Math.random()*350+20, type: Math.random()>0.5?'A':'B'});
+            knn_draw();
+        }
+        const cKnn = document.getElementById('knnCanvas');
+        if(cKnn) {
+            cKnn.addEventListener('mousemove', e => {
+                const r = cKnn.getBoundingClientRect();
+                knnMouse = { x: (e.clientX - r.left)*(cKnn.width/r.width), y: (e.clientY - r.top)*(cKnn.height/r.height) };
+                knn_draw();
+            });
+            cKnn.addEventListener('mousedown', e => {
+                const r = cKnn.getBoundingClientRect();
+                knnPoints.push({ x: (e.clientX - r.left)*(cKnn.width/r.width), y: (e.clientY - r.top)*(cKnn.height/r.height), type: Math.random()>0.5?'A':'B' });
+                knn_draw();
+            });
+        }
+        function knn_draw() {
+            const ctx = cKnn.getContext('2d');
+            ctx.clearRect(0,0,600,400);
+            knnPoints.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, 6.28); ctx.fillStyle = p.type === 'A' ? '#ef4444' : '#3b82f6'; ctx.fill(); });
+            if(knnMouse.x > 0) {
+                const k = parseInt(document.getElementById('knn-k-input').value) || 3;
+                let dists = knnPoints.map(p => ({ p, d: Math.hypot(p.x - knnMouse.x, p.y - knnMouse.y) })).sort((a,b)=>a.d-b.d).slice(0,k);
+                ctx.beginPath(); ctx.arc(knnMouse.x, knnMouse.y, 8, 0, 6.28); ctx.fillStyle = '#94a3b8'; ctx.fill(); 
+                ctx.setLineDash([5,5]);
+                dists.forEach(n => {
+                    ctx.beginPath(); ctx.moveTo(knnMouse.x, knnMouse.y); ctx.lineTo(n.p.x, n.p.y);
+                    ctx.strokeStyle = n.p.type === 'A' ? 'rgba(239,68,68,0.5)' : 'rgba(59,130,246,0.5)'; ctx.stroke();
+                });
+                ctx.setLineDash([]);
+            }
+        }
+
+        /* === HCA === */
+        function hca_init() {
+            hcaPoints = [];
+            for(let i=0; i<8; i++) hcaPoints.push({ id: String.fromCharCode(65+i), x: Math.random()*260+20, y: Math.random()*260+20 });
+            hcaClusters = hcaPoints.map((p,i) => ({points:[p], color:COLORS[i%COLORS.length], id:p.id, dX: 40 + i*30, dH: 0}));
+            hcaHistory = []; 
+            hca_draw();
+        }
+        function hca_step() {
+            if(hcaClusters.length <= 1) return;
+            let minD = Infinity, pair = [-1, -1];
+            for(let i=0; i<hcaClusters.length; i++) {
+                for(let j=i+1; j<hcaClusters.length; j++) {
+                    let d = Infinity;
+                    hcaClusters[i].points.forEach(p1 => hcaClusters[j].points.forEach(p2 => d=Math.min(d, Math.hypot(p1.x-p2.x, p1.y-p2.y))));
+                    if(d < minD) { minD = d; pair = [i, j]; }
+                }
+            }
+            const c1 = hcaClusters[pair[0]], c2 = hcaClusters[pair[1]];
+            const newDX = (c1.dX + c2.dX) / 2;
+            const newC = { points: [...c1.points, ...c2.points], color: c1.color, id: `(${c1.id}${c2.id})`, dX: newDX, dH: minD };
+            hcaHistory.push({ x1: c1.dX, y1: c1.dH, x2: c2.dX, y2: c2.dH, h: minD });
+            hcaClusters = hcaClusters.filter(c => c !== c1 && c !== c2); hcaClusters.push(newC);
+            hca_draw();
+        }
+        function hca_draw() {
+            const ctx = document.getElementById('hcaCanvasPoints').getContext('2d');
+            ctx.clearRect(0,0,300,300);
+            hcaClusters.forEach(c => {
+                c.points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, 6.28); ctx.fillStyle = c.color; ctx.fill(); ctx.fillStyle='#000'; ctx.fillText(p.id, p.x+8, p.y-8); });
+            });
+            const ctxD = document.getElementById('hcaCanvasDendro').getContext('2d');
+            ctxD.clearRect(0,0,300,300); ctxD.font="10px Arial"; ctxD.textAlign = "center";
+            hcaPoints.forEach((p,i) => { ctxD.fillStyle="#000"; ctxD.fillText(p.id, 40+i*30, 290); });
+            ctxD.strokeStyle="#666";
+            const scale = 2; const baseY = 280;
+            hcaHistory.forEach(step => {
+                const y1 = baseY - step.y1 * scale; const y2 = baseY - step.y2 * scale; const yTop = baseY - step.h * scale;
+                ctxD.beginPath(); ctxD.moveTo(step.x1, y1); ctxD.lineTo(step.x1, yTop); ctxD.moveTo(step.x2, y2); ctxD.lineTo(step.x2, yTop); ctxD.moveTo(step.x1, yTop); ctxD.lineTo(step.x2, yTop); ctxD.stroke();
+            });
+        }
+
+        /* === BAYES === */
+        function toggleBnNode(id) { bnState[id] = bnState[id] === null ? true : (bnState[id] ? false : null); updateBn(); }
+        function resetBn() { bnState={spam:null, money:null, urgent:null}; updateBn(); }
+        function updateBn() {
+            const elS = document.getElementById('node-spam-val'); if(elS) elS.innerText = bnState.spam===true?"Vrai":bnState.spam===false?"Faux":"P=0.4";
+            const elM = document.getElementById('node-money-val'); if(elM) elM.innerText = bnState.money===true?"Vrai":bnState.money===false?"Faux":"Obs?";
+            const elU = document.getElementById('node-urgent-val'); if(elU) elU.innerText = bnState.urgent===true?"Vrai":bnState.urgent===false?"Faux":"Obs?";
+            let res = "Posteriori: ";
+            if(bnState.money === true) res += "<span class='text-red-600 font-bold'>SPAM (95%)</span>";
+            else if(bnState.money === false) res += "<span class='text-green-600 font-bold'>HAM (95%)</span>";
+            else res += "Incertain (40%)";
+            const elR = document.getElementById('bn-results'); if(elR) elR.innerHTML = res;
+        }
+
+        /* === EXAM CHARTS === */
+        function initGhardaiaCharts() {
+            const ctxT = document.getElementById('ghardaiaTreeCanvas').getContext('2d');
+            ctxT.clearRect(0,0,350,300);
+            
+            function node(x,y,txt,col) { ctxT.fillStyle=col; ctxT.fillRect(x-30,y-10,60,20); ctxT.fillStyle="white"; ctxT.font="10px Arial"; ctxT.textAlign="center"; ctxT.fillText(txt,x,y+4); }
+            function link(x1,y1,x2,y2,txt) { ctxT.strokeStyle="#999"; ctxT.beginPath(); ctxT.moveTo(x1,y1+10); ctxT.lineTo(x2,y2-10); ctxT.stroke(); ctxT.fillStyle="black"; ctxT.fillText(txt,(x1+x2)/2,(y1+y2)/2); }
+
+            node(175,20, "Age", "#0ea5e9");
+            link(175,20, 70,80, "Petit"); node(70,80, "Etudiant", "#6366f1");
+            link(175,20, 175,80, "Moyen"); node(175,80, "OUI", "#22c55e");
+            link(175,20, 280,80, "Senior"); node(280,80, "Credit", "#6366f1");
+            link(70,80, 40,140, "Non"); node(40,140, "NON", "#ef4444");
+            link(70,80, 100,140, "Oui"); node(100,140, "OUI", "#22c55e");
+            link(280,80, 250,140, "Non"); node(250,140, "NON", "#ef4444");
+            link(280,80, 310,140, "Oui"); node(310,140, "OUI", "#22c55e");
+
+            const ctxK = document.getElementById('ghardaiaKmeansCanvas').getContext('2d');
+            ctxK.clearRect(0,0,300,150); ctxK.strokeStyle="#cbd5e1"; ctxK.beginPath(); ctxK.moveTo(10,80); ctxK.lineTo(290,80); ctxK.stroke();
+            [2,5,8,10,11,18,20].forEach(v => { let x=10+(v/22)*280; ctxK.beginPath(); ctxK.arc(x,80,4,0,6.28); ctxK.fillStyle="#000"; ctxK.fill(); });
+            
+            const ctxH = document.getElementById('ghardaiaHcaCanvas').getContext('2d');
+            ctxH.clearRect(0,0,300,150); ctxH.strokeStyle="#7c3aed";
+            ctxH.beginPath(); ctxH.moveTo(130,130); ctxH.lineTo(130,100); ctxH.lineTo(150,100); ctxH.lineTo(150,130); ctxH.stroke();
+            ctxH.beginPath(); ctxH.moveTo(220,130); ctxH.lineTo(220,90); ctxH.lineTo(250,90); ctxH.lineTo(250,130); ctxH.stroke();
+            ctxH.fillStyle="#000"; ctxH.fillText("10 11", 130,145); ctxH.fillText("18 20", 220,145);
         }
     </script>
 </body>
